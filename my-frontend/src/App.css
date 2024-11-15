@@ -1,38 +1,59 @@
+/* Centers the entire App */
 .App {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #282c34;
+}
+
+/* Centers the header content */
+.App-header {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Styles for the app name */
+h1 {
+  font-size: 2em;
+  color: #61dafb;
+  margin-bottom: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Container to hold each box and label pair */
+.box-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Styles each box-item container to align box and label vertically */
+.box-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
+/* Styles each box */
+.box {
+  width: 150px;
+  height: 150px;
+  border: 2px solid #61dafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Plus sign for the new project box */
+.plus-sign {
+  font-size: 3em;
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Styles for each box label */
+.box-label {
+  font-size: 0.9em;
+  color: #61dafb;
+  margin-top: 10px;
+  text-align: center;
 }
