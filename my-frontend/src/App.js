@@ -8,6 +8,7 @@ import { FaEdit } from 'react-icons/fa'; // Import the edit icon from react-icon
 
 function App() {
   return (
+<<<<<<< HEAD
     <Router>
       <div className="App">
         {/* Define routes, ensuring only the correct page content is displayed */}
@@ -49,6 +50,11 @@ function App() {
         </Routes>
       </div>
     </Router>
+=======
+    <div className="App">
+      <h1>Hello World!</h1>
+    </div>
+>>>>>>> origin/main
   );
 }
 
