@@ -1,9 +1,9 @@
 // src/App.js
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
-import NewProject from './pages/NewProject'; // Import NewProject component
-import WebsiteProj from './pages/WebsiteProj'; // Import WebsiteProj component
-import ProjPage from './pages/ProjPage';
+import NewProject from './pages/NewProjectOptions'; // Import NewProject component
+import WebsiteProj from './pages/NewWebsiteProject'; // Import WebsiteProj component
+import ProjPage from './pages/ProjectMainPage';
 import HomePage from './pages/HomePage'; // Import the edit icon from react-icons
 
 function App() {
