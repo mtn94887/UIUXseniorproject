@@ -16,12 +16,12 @@ function App() {
           <Route path="/" element={<HomePage/>}/>
           
           {/* New Project Route */}
-          <Route path="/new-project" element={<NewProject />} />
+          <Route path="/new-project-options" element={<NewProject />} />
 
           {/* Website Project Route */}
-          <Route path="/website-project" element={<WebsiteProj />} />
+          <Route path="/new-website-project" element={<WebsiteProj />} />
 
-          <Route path="/proj-page" element={<ProjPage />} />
+          <Route path="/project-main-page" element={<ProjPage />} />
 
         </Routes>
       </div>

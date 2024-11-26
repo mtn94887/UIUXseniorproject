@@ -18,6 +18,20 @@ function WebsiteProj() {
         <div style={styles.boxContainer}>
           <div style={styles.boxItem}>
             <label style={styles.boxLabel}>
+              Project Name:
+              <input
+                type="text"
+                placeholder="Enter Project Name"
+                style={styles.inputField}
+              />
+            </label>
+          </div>
+        </div>
+
+        {/* Website URL Component */}
+        <div style={styles.boxContainer}>
+          <div style={styles.boxItem}>
+            <label style={styles.boxLabel}>
               Website URL:
               <input
                 type="text"
@@ -64,7 +78,7 @@ function WebsiteProj() {
         </div>
 
         {/* Proceed Button */}
-        <Link to="/proj-page">
+        <Link to="/project-main-page">
           <button style={styles.proceedButton}>Proceed</button>
         </Link>
       </header>

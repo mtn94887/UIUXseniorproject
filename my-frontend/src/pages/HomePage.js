@@ -9,7 +9,7 @@ function HomePage(){
             <header className="App-header">
                 <h1>Koala Usability Testing</h1>
                 <div className="box-container">
-                <Link to="/new-project" className="box-item">
+                <Link to="/new-project-options" className="box-item">
                     <div className="box">
                     <span className="plus-sign">+</span>
                     </div>

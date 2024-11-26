@@ -19,7 +19,7 @@ function NewProject() {
 
           {/* Website Box */}
           <div className="box-item">
-            <Link to="/website-project" className="box">
+            <Link to="/new-website-project" className="box">
               <FaGlobeAmericas size={50} color="#61dafb" /> {/* Icon for Website */}
             </Link>
             <p className="box-label">Website</p>
