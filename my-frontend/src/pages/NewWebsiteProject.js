@@ -267,5 +267,55 @@ function WebsiteProj() {
 }
 
 // Include your styles here...
+const styles = {
+  app: {
+    textAlign: 'center',
+    fontFamily: 'Arial, sans-serif',
+  },
+  header: {
+    backgroundColor: '#282c34',
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+  },
+  boxContainer: {
+    margin: '20px 0',
+  },
+  boxItem: {
+    marginBottom: '10px',
+  },
+  boxLabel: {
+    display: 'block',
+    marginBottom: '5px',
+    fontWeight: 'bold',
+  },
+  inputField: {
+    width: '300px',
+    padding: '10px',
+    fontSize: '16px',
+  },
+  sampleButton: {
+    margin: '0 10px',
+    padding: '5px 10px',
+    fontSize: '16px',
+  },
+  sampleCount: {
+    fontSize: '16px',
+    fontWeight: 'bold',
+  },
+  proceedButton: {
+    padding: '10px 20px',
+    fontSize: '16px',
+    color: '#fff',
+    backgroundColor: '#61dafb',
+    border: 'none',
+    cursor: 'pointer',
+    borderRadius: '5px',
+  },
+};
+
 
 export default WebsiteProj;
