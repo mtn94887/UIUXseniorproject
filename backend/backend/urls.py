@@ -21,9 +21,23 @@ Including another URLconf
 #     path("admin/", admin.site.urls),
 # ]
 
+# from django.urls import path
+# from django.http import JsonResponse
+# from backend.views import ProjectCreateView
+# from django.views.generic import TemplateView
+
+# urlpatterns = [
+#     # path('', lambda request: JsonResponse({'message': 'Welcome to the API'})),  # Root URL placeholder
+#     path('', TemplateView.as_view(template_name='index.html')),  # React index
+
+#     path('create-project/', ProjectCreateView.as_view(), name='create-project'),
+# ]
+
 from django.urls import path
+from .views import index
 from backend.views import ProjectCreateView
 
 urlpatterns = [
+    path('', index, name='home'),  # Serve React's index.html at the root URL
     path('create-project/', ProjectCreateView.as_view(), name='create-project'),
 ]
