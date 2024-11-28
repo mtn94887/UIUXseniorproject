@@ -28,14 +28,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Static files settings
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
 # STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'frontend/build/static'),  # React static files
+#     os.path.join(BASE_DIR, 'my-frontend/build/static'),  # React static files
 # ]
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Point to the static directory in the backend
-]
-STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # Application definition
 
@@ -47,7 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'rest_framework',
-    'backend',
+    'usabilitytestingproject',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +57,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "backend.urls"
+ROOT_URLCONF = "usabilitytestingproject.urls"
 
 TEMPLATES = [
     {
@@ -78,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "backend.wsgi.application"
+WSGI_APPLICATION = "usabilitytestingproject.wsgi.application"
 
 
 # Database
@@ -126,7 +123,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'my-frontend/build/static')]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

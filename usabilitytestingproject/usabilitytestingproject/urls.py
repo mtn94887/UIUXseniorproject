@@ -33,11 +33,20 @@ Including another URLconf
 #     path('create-project/', ProjectCreateView.as_view(), name='create-project'),
 # ]
 
-from django.urls import path
-from .views import index
-from backend.views import ProjectCreateView
+# from django.urls import path
+# from .views import index
+# from backend.views import ProjectCreateView
 
+# urlpatterns = [
+#     path('', index, name='home'),  # Serve React's index.html at the root URL
+#     path('create-project/', ProjectCreateView.as_view(), name='create-project'),
+# ]
+
+
+from django.contrib import admin 
+from django.urls import path 
+from . import views 
 urlpatterns = [
-    path('', index, name='home'),  # Serve React's index.html at the root URL
-    path('create-project/', ProjectCreateView.as_view(), name='create-project'),
+    path('admin/', admin.site.urls),
+    path('', views.index, name ='index')
 ]
