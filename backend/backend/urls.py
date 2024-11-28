@@ -22,7 +22,7 @@ Including another URLconf
 # ]
 
 from django.urls import path
-from .views import ProjectCreateView
+from backend.views import ProjectCreateView
 
 urlpatterns = [
     path('create-project/', ProjectCreateView.as_view(), name='create-project'),
