@@ -48,5 +48,7 @@ from django.urls import path
 from . import views 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index, name ='index')
+    path('', views.index, name ='index'),
+    path('create-project/', views.create_project, name='create_project'),
+    path('list-projects/', views.list_projects, name='list_projects'),
 ]
