@@ -34,7 +34,7 @@ function WebsiteProj() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/create-project/', {
+      await axios.post('http://127.0.0.1:8000/create-project/', {
         project_name: formData.project_name,
         website_url: formData.website_url,
         description: formData.description,
@@ -126,12 +126,10 @@ function WebsiteProj() {
         </div>
 
         {/* Proceed Button */}
-        {/* <Link to="/project-main-page">
-          <button style={styles.proceedButton}>Proceed</button>
-        </Link> */}
-        <button onClick={handleSubmit} style={styles.proceedButton}>
-          Submit
-        </button>
+        <Link to="/project-list">
+          <button onClick={handleSubmit} style={styles.proceedButton}>Submit</button>        
+        </Link>
+        
       </header>
     </div>
   );

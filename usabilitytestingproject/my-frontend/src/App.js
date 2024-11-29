@@ -5,6 +5,7 @@ import NewProject from './pages/NewProjectOptions'; // Import NewProject compone
 import WebsiteProj from './pages/NewWebsiteProject'; // Import WebsiteProj component
 import ProjPage from './pages/ProjectMainPage';
 import HomePage from './pages/HomePage'; // Import the edit icon from react-icons
+import ProjectLists from './pages/ProjectLists';
 
 function App() {
   return (
@@ -13,13 +14,15 @@ function App() {
         {/* Define routes, ensuring only the correct page content is displayed */}
         <Routes>
           {/* Main Page Route */}
-          <Route path="/" element={<HomePage/>}/>
+          <Route path="/" element={<HomePage />}/>
           
           {/* New Project Route */}
           <Route path="/new-project-options" element={<NewProject />} />
 
           {/* Website Project Route */}
           <Route path="/new-website-project" element={<WebsiteProj />} />
+
+          <Route path="/project-list" element={<ProjectLists />} />
 
           <Route path="/project-main-page" element={<ProjPage />} />
 
