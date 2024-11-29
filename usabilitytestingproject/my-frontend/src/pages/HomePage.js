@@ -6,7 +6,9 @@ import { Link } from 'react-router-dom';
 function HomePage(){
     return (
         <div>
+            <header className='App-header '>
             <h1>Koala Usability Testing</h1>
+            </header>
             <div className="boxes-wrapper">
                 <div className="box-container">
                     <Link to="/new-project-options" className="box-item">
