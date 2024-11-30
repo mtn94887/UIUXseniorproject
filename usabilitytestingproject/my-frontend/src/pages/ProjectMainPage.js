@@ -24,26 +24,6 @@ return (
       {/* Left Column: Project Details */}
       <div style={styles.leftColumn}>
         <h1 style={styles.header}>Project Details</h1>
-        {/* <div style={styles.projectList}>
-          {projects.length > 0 ? (
-            projects.map((project, index) => (
-              <div key={index} style={styles.projectCard}>
-                <h2 style={styles.projectName}>{project.project_name}</h2>
-                <p style={styles.projectDetail}>
-                  <strong>Website URL:</strong> {project.website_url}
-                </p>
-                <p style={styles.projectDetail}>
-                  <strong>Description:</strong> {project.description}
-                </p>
-                <p style={styles.projectDetail}>
-                  <strong>Sample Size:</strong> {project.sample_size}
-                </p>
-              </div>
-            ))
-          ) : (
-            <p style={styles.noResultsText}>No projects available.</p>
-          )}
-        </div> */}
         <div style={styles.projectCard}>
           <h2 style={styles.projectName}>{project.project_name}</h2>
           <p style={styles.projectDetail}>
@@ -59,7 +39,12 @@ return (
         <h1></h1>
         <h1></h1>
         <div style={styles.buttonContainer}>
-          <button style={styles.startButton}>Start</button>
+          <button 
+            style={styles.startButton}
+            onClick={() => window.open(project.website_url, '_blank')}
+          >
+            Start
+          </button>
           <button style={styles.settingsButton}>Settings</button>
         </div>
       </div>
