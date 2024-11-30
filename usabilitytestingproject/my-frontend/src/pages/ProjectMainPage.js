@@ -17,7 +17,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     height: '100vh',
-    backgroundColor: '#282c34',  // Same background color as other pages
+    //backgroundColor: '#282c34',  // Same background color as other pages
     color: '#61dafb',  // Text color to match the theme
     position: 'relative',  // Needed for absolute positioning of the "Start" and "Settings" buttons
   },
