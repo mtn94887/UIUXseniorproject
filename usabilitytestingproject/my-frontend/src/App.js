@@ -24,7 +24,7 @@ function App() {
 
           <Route path="/project-list" element={<ProjectLists />} />
 
-          <Route path="/project-main-page" element={<ProjPage />} />
+          <Route path="/project-main-page/:id" element={<ProjPage />} />
 
         </Routes>
       </div>

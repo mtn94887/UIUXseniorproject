@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
+
 
 function ProjPage() {
-  const [projects, setProjects] = useState([]);
+  const { id } = useParams(); 
+  const [project, setProjects] = useState([]);
 
   useEffect(() => {
     // Fetch projects from the API
-    axios.get('http://127.0.0.1:8000/list-projects/')
+    axios.get(`http://127.0.0.1:8000/list-projects/${id}/`)
       .then((response) => {
         console.log(response.data); // Log response
         setProjects(response.data);
@@ -14,14 +17,14 @@ function ProjPage() {
       .catch((error) => {
         console.error('Error fetching projects:', error);
       });
-  }, []);
+  }, [id]);
 
 return (
   <div style={styles.pageContainer}>
       {/* Left Column: Project Details */}
       <div style={styles.leftColumn}>
         <h1 style={styles.header}>Project Details</h1>
-        <div style={styles.projectList}>
+        {/* <div style={styles.projectList}>
           {projects.length > 0 ? (
             projects.map((project, index) => (
               <div key={index} style={styles.projectCard}>
@@ -40,6 +43,18 @@ return (
           ) : (
             <p style={styles.noResultsText}>No projects available.</p>
           )}
+        </div> */}
+        <div style={styles.projectCard}>
+          <h2 style={styles.projectName}>{project.project_name}</h2>
+          <p style={styles.projectDetail}>
+            <strong>Website URL:</strong> <a href={project.website_url}>{project.website_url}</a>
+          </p>
+          <p style={styles.projectDetail}>
+            <strong>Description:</strong> {project.description}
+          </p>
+          <p style={styles.projectDetail}>
+            <strong>Sample Size:</strong> {project.sample_size}
+          </p>
         </div>
         <h1></h1>
         <h1></h1>

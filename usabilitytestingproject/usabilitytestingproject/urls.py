@@ -51,4 +51,5 @@ urlpatterns = [
     path('', views.index, name ='index'),
     path('create-project/', views.create_project, name='create_project'),
     path('list-projects/', views.list_projects, name='list_projects'),
+    path('list-projects/<int:id>/', views.project_detail, name='project_detail'),  # For specific project detail
 ]

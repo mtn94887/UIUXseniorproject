@@ -43,7 +43,7 @@ function ProjectLists(){
                             <td style={styles.td}>{project.description}</td>
                             <td style={styles.td}>{project.sample_size}</td>
                             <td style={styles.th}>
-                                <Link to="/project-main-page">
+                                <Link to={`/project-main-page/${project.id}`}>
                                     <button style={styles.proceedButton}>Details</button>        
                                 </Link>
                             </td>
