@@ -6,7 +6,7 @@
 
 1. git clone https://github.com/mtn94887/UIUXseniorproject.git
 2. open terminal in the VS code 
-3. source backend_env/bin/activate
+3. source backend_env/bin/activate (if you use macOS)
 4. cd usabilitytestingproject 
 5. pip install django 
 6. pip install djangorestframework
