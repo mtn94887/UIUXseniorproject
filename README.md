@@ -1,13 +1,19 @@
-# Getting Started with Create React App
+# Getting Started with Koala usability testing software
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**This project is not yet finished
 
-## Available Scripts
+## How to install and set up 
 
-hello this is code
+1. git clone https://github.com/mtn94887/UIUXseniorproject.git
+2. open terminal in the VS code 
+3. source backend_env/bin/activate
+4. cd usabilitytestingproject 
+5. pip install django 
+6. pip install djangorestframework
+7. python manage.py runserver
 
+## How to write the codes 
 
-In the project directory, you can run:
 
 ### `npm start`
 
