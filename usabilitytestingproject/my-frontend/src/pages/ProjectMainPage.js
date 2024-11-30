@@ -1,60 +1,151 @@
-// src/pages/ProjPage.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 function ProjPage() {
-  return (
-    <div style={styles.pageContainer}>
-      <button style={styles.startButton}>Start</button>
-      <button style={styles.settingsButton}>Settings</button>
-      <p style={styles.noResultsText}>No results to display for now.</p>
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    // Fetch projects from the API
+    axios.get('http://127.0.0.1:8000/list-projects/')
+      .then((response) => {
+        console.log(response.data); // Log response
+        setProjects(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching projects:', error);
+      });
+  }, []);
+
+return (
+  <div style={styles.pageContainer}>
+      {/* Left Column: Project Details */}
+      <div style={styles.leftColumn}>
+        <h1 style={styles.header}>Project Details</h1>
+        <div style={styles.projectList}>
+          {projects.length > 0 ? (
+            projects.map((project, index) => (
+              <div key={index} style={styles.projectCard}>
+                <h2 style={styles.projectName}>{project.project_name}</h2>
+                <p style={styles.projectDetail}>
+                  <strong>Website URL:</strong> {project.website_url}
+                </p>
+                <p style={styles.projectDetail}>
+                  <strong>Description:</strong> {project.description}
+                </p>
+                <p style={styles.projectDetail}>
+                  <strong>Sample Size:</strong> {project.sample_size}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p style={styles.noResultsText}>No projects available.</p>
+          )}
+        </div>
+        <h1></h1>
+        <h1></h1>
+        <div style={styles.buttonContainer}>
+          <button style={styles.startButton}>Start</button>
+          <button style={styles.settingsButton}>Settings</button>
+        </div>
+      </div>
+
+      {/* Right Column: Buttons and Message */}
+      <div style={styles.rightColumn}>
+        <p style={styles.noDataText}>No data yet.</p>
+      </div>
     </div>
   );
+    
 }
 
-// Inline styles for the ProjPage component
 const styles = {
   pageContainer: {
     display: 'flex',
-    alignItems: 'center',
-    height: '100vh',
-    //backgroundColor: '#282c34',  // Same background color as other pages
-    color: '#61dafb',  // Text color to match the theme
-    position: 'relative',  // Needed for absolute positioning of the "Start" and "Settings" buttons
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: '20px',
+    backgroundColor: '#282c34',
+    color: '#61dafb',
+    minHeight: '100vh',
   },
-  noResultsText: {
-    fontSize: '1.5em',
+  leftColumn: {
+    flex: 1,
+    padding: '20px',
+    marginRight: '20px',
+    borderRight: '1px solid #61dafb',
+  },
+  rightColumn: {
+    flex: 6,
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  header: {
+    fontSize: '2em',
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: '50px',  // Ensure text doesn't overlap with the buttons
+    marginBottom: '20px',
+  },
+  projectList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+  },
+  projectCard: {
+    backgroundColor: '#20232a',
+    color: '#61dafb',
+    borderRadius: '8px',
+    padding: '15px',
+    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+  },
+  projectName: {
+    fontSize: '1.5em',
+    marginBottom: '10px',
+  },
+  projectDetail: {
+    fontSize: '1em',
+    marginBottom: '8px',
+  },
+  buttonContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+    width: '100%',
+    alignItems: 'center',
   },
   startButton: {
-    position: 'absolute',  // Position the button relative to the page container
-    top: '30px',  // Distance from the top of the container
-    left: '750px',  // Move the button to the left
-    backgroundColor: '#61dafb',  // Button background color
-    color: '#282c34',  // Button text color
+    backgroundColor: '#61dafb',
+    color: '#282c34',
     border: 'none',
     padding: '10px 20px',
     fontSize: '1em',
     borderRadius: '4px',
     cursor: 'pointer',
     fontWeight: 'bold',
-    width: '120px',
+    width: '80%',
   },
   settingsButton: {
-    position: 'absolute',  // Position the "Settings" button below the "Start" button
-    top: '80px',  // Adjust this value to place it below the "Start" button
-    left: '750px',  // Align it to the left same as the "Start" button
-    backgroundColor: '#61dafb',  // Button background color
-    color: '#282c34',  // Button text color
+    backgroundColor: '#61dafb',
+    color: '#282c34',
     border: 'none',
     padding: '10px 20px',
     fontSize: '1em',
     borderRadius: '4px',
     cursor: 'pointer',
     fontWeight: 'bold',
-    width: '120px',
+    width: '80%',
+  },
+  noDataText: {
+    fontSize: '1.2em',
+    fontWeight: 'bold',
+    marginTop: '20px',
+    textAlign: 'center',
+  },
+  noResultsText: {
+    fontSize: '1em',
+    fontWeight: 'normal',
+    textAlign: 'center',
   },
 };
-
 export default ProjPage;

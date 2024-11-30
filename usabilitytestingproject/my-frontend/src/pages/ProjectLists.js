@@ -23,14 +23,6 @@ function ProjectLists(){
     return(
         <div>
             {projects.length > 0 ? (
-                // projects.map(project => (
-                //     <div key={project.id} style={styles.projectBox}>
-                //         <h2>{project.project_name}</h2>
-                //         <p><strong>Website:</strong> <a href={project.website_url}>{project.website_url}</a></p>
-                //         <p><strong>Description:</strong> {project.description}</p>
-                //         <p><strong>Sample Size:</strong> {project.sample_size}</p>
-                //     </div>
-                // ))
                 <table style={styles.table}>
                     <thead>
                         <tr>
