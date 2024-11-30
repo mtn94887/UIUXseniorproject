@@ -91,6 +91,7 @@ const styles = {
       td: {
         padding: '10px',
         border: '1px solid #ddd',
+        color: '#61dafb', 
       },
       proceedButton: {
         backgroundColor: '#61dafb',
