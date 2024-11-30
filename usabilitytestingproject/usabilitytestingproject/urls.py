@@ -46,10 +46,16 @@ Including another URLconf
 from django.contrib import admin 
 from django.urls import path 
 from . import views 
+from django.views.generic import TemplateView
+from django.urls import re_path
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name ='index'),
     path('create-project/', views.create_project, name='create_project'),
     path('list-projects/', views.list_projects, name='list_projects'),
     path('list-projects/<int:id>/', views.project_detail, name='project_detail'),  # For specific project detail
+
+        re_path(r'^(?!admin).*$', TemplateView.as_view(template_name='index.html')),
+
 ]

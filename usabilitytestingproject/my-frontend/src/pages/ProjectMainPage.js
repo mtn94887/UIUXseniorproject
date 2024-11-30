@@ -69,16 +69,14 @@ return (
         <h1></h1>
         <h1></h1>
         <div style={styles.buttonContainer}>
-        <Link to={`/webcam-page`}>
+        {/* <Link to={`/webcam-page`}>
        <button style={styles.startButton}>open camera</button>        
-          </Link>
+          </Link> */}
           <button 
             style={styles.startButton}
             //onClick={() => window.open(project.website_url, '_blank')}
             onClick={handleStartProject}
           >
-            handleCameraOpen
-
             Start the usability testing
           </button>
 
