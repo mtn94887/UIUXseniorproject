@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
 
 
 function WebsiteProj() {
-  // const [sampleSize, setSampleSize] = useState(0);
-
-  // // Handle increase and decrease for sample size
-  // const increaseSampleSize = () => setSampleSize(sampleSize + 1);
-  // const decreaseSampleSize = () => setSampleSize(sampleSize > 0 ? sampleSize - 1 : 0);
+  
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -22,16 +19,6 @@ function WebsiteProj() {
     setFormData({ ...formData, [name]: value });
   };
 
-  // const handleSubmit = async () => {
-  //   try {
-  //     const response = await axios.post('http://127.0.0.1:8000/create-project/', formData);
-  //     alert('Project created successfully!');
-  //     setFormData({ project_name: '', website_url: '', description: '', sample_size: 0 });
-  //   } catch (error) {
-  //     console.error('Error creating project:', error);
-  //   }
-  // };
-
   const handleSubmit = async () => {
     try {
       await axios.post('http://127.0.0.1:8000/create-project/', {
@@ -42,6 +29,7 @@ function WebsiteProj() {
       });
       alert('Project created successfully!');
       setFormData({ project_name: '', website_url: '', description: '', sample_size: 0 });
+      navigate('/project-list'); // Navigate to the next page
     } catch (error) {
       console.error('Error creating project:', error.response.data);
     }
@@ -60,7 +48,7 @@ function WebsiteProj() {
               Project Name:
               <input
                 type="text"
-                name="name"
+                name="project_name"
                 value={formData.project_name}
                 onChange={handleInputChange}
                 placeholder="Enter Project Name"
@@ -126,9 +114,7 @@ function WebsiteProj() {
         </div>
 
         {/* Proceed Button */}
-        <Link to="/project-list">
           <button onClick={handleSubmit} style={styles.proceedButton}>Submit</button>        
-        </Link>
         
       </header>
     </div>
