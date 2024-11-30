@@ -1,11 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+
+//for webcam 
+import Webcam from 'react-webcam';
 
 
 function ProjPage() {
   const { id } = useParams(); 
   const [project, setProjects] = useState([]);
+
+  const [showWebcam, setShowWebcam] = useState(false); // State to control webcam visibility
+  const webcamRef = useRef(null);
+
 
   useEffect(() => {
     // Fetch projects from the API
@@ -18,6 +25,22 @@ function ProjPage() {
         console.error('Error fetching projects:', error);
       });
   }, [id]);
+
+  // Function to handle the Start button click
+  const handleStartWebcam = () => {
+    setShowWebcam(true); // Show the webcam
+  };
+
+  // Function to handle the Stop button click
+  const handleStopWebcam = () => {
+    setShowWebcam(false); // Hide the webcam
+  };
+
+  // Function to handle the Start button click
+  const handleStartProject = () => {
+    window.open(project.website_url, '_blank'); // Open the website in a new tab
+    //setShowWebcam(true); // Show the webcam
+  };
 
 return (
   <div style={styles.pageContainer}>
@@ -41,9 +64,10 @@ return (
         <div style={styles.buttonContainer}>
           <button 
             style={styles.startButton}
-            onClick={() => window.open(project.website_url, '_blank')}
+            //onClick={() => window.open(project.website_url, '_blank')}
+            onClick={handleStartProject}
           >
-            Start
+            Start the usability testing
           </button>
           <button style={styles.settingsButton}>Settings</button>
         </div>
@@ -51,7 +75,43 @@ return (
 
       {/* Right Column: Buttons and Message */}
       <div style={styles.rightColumn}>
-        <p style={styles.noDataText}>No data yet.</p>
+        {/* <p style={styles.noDataText}>No data yet.</p> */}
+        {/* {showWebcam ? (
+          <>
+            <h2 style={styles.header}>Webcam Feed</h2>
+            <Webcam
+              audio={false}
+              ref={webcamRef}
+              style={{ width: '100%', borderRadius: '8px' }}
+            />
+          </>
+        ) : (
+          <p style={styles.noDataText}>Click "Start" to open the website and activate the webcam.</p>
+        )} */}
+        <h2 style={styles.header}>Webcam Control</h2>
+        <div style={styles.webcamButtonContainer}>
+          <button
+            style={styles.startButton}
+            onClick={handleStartWebcam} // Start webcam
+            disabled={showWebcam} // Disable when webcam is active
+          >
+            Start Webcam
+          </button>
+          <button
+            style={styles.stopButton}
+            onClick={handleStopWebcam} // Stop webcam
+            disabled={!showWebcam} // Disable when webcam is inactive
+          >
+            Stop Webcam
+          </button>
+        </div>
+        {showWebcam && (
+          <Webcam
+            audio={false}
+            ref={webcamRef}
+            style={{ width: '90%', borderRadius: '8px', marginTop: '20px' }}
+          />
+        )}
       </div>
     </div>
   );
@@ -115,6 +175,17 @@ const styles = {
     alignItems: 'center',
   },
   startButton: {
+    backgroundColor: '#61dafb',
+    color: '#282c34',
+    border: 'none',
+    padding: '10px 20px',
+    fontSize: '1em',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    width: '80%',
+  },
+  stopButton: {
     backgroundColor: '#61dafb',
     color: '#282c34',
     border: 'none',
