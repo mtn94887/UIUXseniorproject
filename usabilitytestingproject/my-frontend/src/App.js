@@ -6,6 +6,7 @@ import WebsiteProj from './pages/NewWebsiteProject'; // Import WebsiteProj compo
 import ProjPage from './pages/ProjectMainPage';
 import HomePage from './pages/HomePage'; // Import the edit icon from react-icons
 import ProjectLists from './pages/ProjectLists';
+import WebcamPage from './pages/WebcamPage';
 
 function App() {
   return (
@@ -25,6 +26,8 @@ function App() {
           <Route path="/project-list" element={<ProjectLists />} />
 
           <Route path="/project-main-page/:id" element={<ProjPage />} />
+
+          <Route path="/webcam-page" element={<WebcamPage />} />
 
         </Routes>
       </div>

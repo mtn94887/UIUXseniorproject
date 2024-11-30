@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-
+import WebcamPage from './WebcamPage';
 //for webcam 
 import Webcam from 'react-webcam';
+import { Link } from 'react-router-dom';
+
 
 
 function ProjPage() {
@@ -41,6 +43,11 @@ function ProjPage() {
     window.open(project.website_url, '_blank'); // Open the website in a new tab
     //setShowWebcam(true); // Show the webcam
   };
+  const handleCameraOpen = () => {
+    window.open(`/webcam-page`, '_blank'); // Open the website in a new tab
+    //setShowWebcam(true); // Show the webcam
+  };
+
 
 return (
   <div style={styles.pageContainer}>
@@ -62,12 +69,26 @@ return (
         <h1></h1>
         <h1></h1>
         <div style={styles.buttonContainer}>
+        <Link to={`/webcam-page`}>
+       <button style={styles.startButton}>open camera</button>        
+          </Link>
           <button 
             style={styles.startButton}
             //onClick={() => window.open(project.website_url, '_blank')}
             onClick={handleStartProject}
           >
+            handleCameraOpen
+
             Start the usability testing
+          </button>
+
+          <button 
+            style={styles.startButton}
+            //onClick={() => window.open(project.website_url, '_blank')}
+            onClick={handleCameraOpen}
+          >
+            open camera 
+            
           </button>
           <button style={styles.settingsButton}>Settings</button>
         </div>
@@ -88,30 +109,7 @@ return (
         ) : (
           <p style={styles.noDataText}>Click "Start" to open the website and activate the webcam.</p>
         )} */}
-        <h2 style={styles.header}>Webcam Control</h2>
-        <div style={styles.webcamButtonContainer}>
-          <button
-            style={styles.startButton}
-            onClick={handleStartWebcam} // Start webcam
-            disabled={showWebcam} // Disable when webcam is active
-          >
-            Start Webcam
-          </button>
-          <button
-            style={styles.stopButton}
-            onClick={handleStopWebcam} // Stop webcam
-            disabled={!showWebcam} // Disable when webcam is inactive
-          >
-            Stop Webcam
-          </button>
-        </div>
-        {showWebcam && (
-          <Webcam
-            audio={false}
-            ref={webcamRef}
-            style={{ width: '90%', borderRadius: '8px', marginTop: '20px' }}
-          />
-        )}
+        <p>here is a code</p>
       </div>
     </div>
   );
