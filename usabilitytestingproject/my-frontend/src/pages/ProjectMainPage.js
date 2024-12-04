@@ -7,14 +7,12 @@ import Webcam from 'react-webcam';
 import { Link } from 'react-router-dom';
 
 
-
 function ProjPage() {
   const { id } = useParams(); 
   const [project, setProjects] = useState([]);
 
   const [showWebcam, setShowWebcam] = useState(false); // State to control webcam visibility
   const webcamRef = useRef(null);
-
 
   useEffect(() => {
     // Fetch projects from the API
@@ -47,7 +45,6 @@ function ProjPage() {
     window.open(`/webcam-page`, '_blank'); // Open the website in a new tab
     //setShowWebcam(true); // Show the webcam
   };
-
 
 return (
   <div style={styles.pageContainer}>

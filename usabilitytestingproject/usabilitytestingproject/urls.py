@@ -54,8 +54,8 @@ urlpatterns = [
     path('', views.index, name ='index'),
     path('create-project/', views.create_project, name='create_project'),
     path('list-projects/', views.list_projects, name='list_projects'),
-    path('list-projects/<int:id>/', views.project_detail, name='project_detail'),  # For specific project detail
-
-        re_path(r'^(?!admin).*$', TemplateView.as_view(template_name='index.html')),
-
+    path('list-projects/<int:id>/', views.project_detail, name='project_detail'),  
+    path('emotion-detection/', views.emotion_detection, name='emotion_detection'),
+    re_path(r'^(?!admin).*$', TemplateView.as_view(template_name='index.html')),
 ]
+

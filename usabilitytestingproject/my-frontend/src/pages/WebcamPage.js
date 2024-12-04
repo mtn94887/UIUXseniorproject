@@ -1,12 +1,14 @@
 import Webcam from 'react-webcam';
-import React, { useState, useRef } from 'react';
-
+import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios'; // For sending HTTP requests to the backend
 
 function WebcamPage(){
     const [showWebcam, setShowWebcam] = useState(false); // State to control webcam visibility
+    const [emotion, setEmotion] = useState(''); // State to store detected emotion
     const webcamRef = useRef(null);
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-     // Function to handle the Start button click
+    // Function to handle the Start button click
     const handleStartWebcam = () => {
         setShowWebcam(true); // Show the webcam
     };
@@ -16,8 +18,50 @@ function WebcamPage(){
         setShowWebcam(false); // Hide the webcam
     };
 
-    return(
-        <div> 
+    // Function to capture a frame and send it to the backend for emotion detection
+    // const captureAndSendFrame = async () => {
+    //     const imageSrc = webcamRef.current.getScreenshot(); // Capture frame
+    //     if (imageSrc) {
+    //         try {
+    //             const response = await axios.post('http://127.0.0.1:8000/emotion-detection/', {
+    //                 image: imageSrc
+    //             });
+    //             setEmotion(response.data.emotion); // Set the detected emotion
+    //         } catch (error) {
+    //             console.error('Error capturing frame:', error);
+    //         }
+    //     }
+    // };
+    const captureAndSendFrame = async () => {
+        const imageSrc = webcamRef.current.getScreenshot(); // Capture frame
+        if (imageSrc) {
+          try {
+            const response = await axios.post('http://127.0.0.1:8000/emotion-detection/', {
+              image: imageSrc
+            }, {
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken  // Include CSRF token in the request header
+              }
+            });
+            setEmotion(response.data.emotion); // Set the detected emotion
+          } catch (error) {
+            console.error('Error capturing frame:', error);
+          }
+        }
+      };
+
+    // Capture frame every second (or adjust as needed for real-time feedback)
+    useEffect(() => {
+        let interval;
+        if (showWebcam) {
+            interval = setInterval(captureAndSendFrame, 1000); // Send frame every 1 second
+        }
+        return () => clearInterval(interval); // Cleanup the interval when webcam is stopped
+    }, [showWebcam]);
+
+    return (
+        <div style={styles.pretty} > 
             <h2 style={styles.header}>Webcam Control</h2>
             <div style={styles.webcamButtonContainer}>
                 <button
@@ -36,17 +80,24 @@ function WebcamPage(){
                 </button>
             </div>
             {showWebcam && (
-            <Webcam
-                audio={false}
-                ref={webcamRef}
-                style={{ width: '90%', borderRadius: '8px', marginTop: '20px' }}
-            />
+                <Webcam
+                    audio={false}
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                    width="100%"
+                    videoConstraints={{ facingMode: 'user' }}
+                    style={{ width: '90%', borderRadius: '8px', marginTop: '20px' }}
+                />
             )}
+            {emotion && <h3>Detected Emotion: {emotion}</h3>}
         </div>
-    )
+    );
 }
 
 const styles = {
+    pretty:{
+        color:'#282c34',
+    },
     header: {
         fontSize: '2em',
         fontWeight: 'bold',
@@ -58,7 +109,7 @@ const styles = {
         gap: '20px',
         width: '100%',
         alignItems: 'center',
-      },
+    },
     startButton: {
         backgroundColor: '#61dafb',
         color: '#282c34',
@@ -71,17 +122,16 @@ const styles = {
         width: '80%',
     },
     stopButton: {
-    backgroundColor: '#61dafb',
-    color: '#282c34',
-    border: 'none',
-    padding: '10px 20px',
-    fontSize: '1em',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    width: '80%',
+        backgroundColor: '#61dafb',
+        color: '#282c34',
+        border: 'none',
+        padding: '10px 20px',
+        fontSize: '1em',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        width: '80%',
     },
-
 }
 
-export default WebcamPage
+export default WebcamPage;
