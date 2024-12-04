@@ -7,10 +7,18 @@
 1. git clone https://github.com/mtn94887/UIUXseniorproject.git
 2. open terminal in the VS code 
 3. source backend_env/bin/activate (if you use macOS)
+
+### for the backend
 4. cd usabilitytestingproject 
 5. pip install django 
 6. pip install djangorestframework
-7. python manage.py runserver
+7. python manage.py runserver (to run both backend and frontend)
+
+### for the frontend
+8. cd my-frontend
+9. npm install
+10. npm start (to run)
+*** in the frontend after every changes in codes, `npm run build` to be saved and displayed 
 
 ## How to write the codes 
 
