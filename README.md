@@ -18,6 +18,7 @@
 8. cd my-frontend
 9. npm install
 10. npm start (to run)
+
 *** in the frontend after every changes in codes, `npm run build` to be saved and displayed 
 
 ## How to write the codes 
