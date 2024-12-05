@@ -5,7 +5,9 @@ import axios from 'axios'; // For sending HTTP requests to the backend
 function WebcamPage(){
     const [showWebcam, setShowWebcam] = useState(false); // State to control webcam visibility
     const [emotion, setEmotion] = useState(''); // State to store detected emotion
+    const [landmarks, setLandmarks] = useState([]);
     const webcamRef = useRef(null);
+    const canvasRef = useRef(null);
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     // Function to handle the Start button click
@@ -18,20 +20,32 @@ function WebcamPage(){
         setShowWebcam(false); // Hide the webcam
     };
 
-    // Function to capture a frame and send it to the backend for emotion detection
-    // const captureAndSendFrame = async () => {
-    //     const imageSrc = webcamRef.current.getScreenshot(); // Capture frame
-    //     if (imageSrc) {
-    //         try {
-    //             const response = await axios.post('http://127.0.0.1:8000/emotion-detection/', {
-    //                 image: imageSrc
-    //             });
-    //             setEmotion(response.data.emotion); // Set the detected emotion
-    //         } catch (error) {
-    //             console.error('Error capturing frame:', error);
-    //         }
-    //     }
-    // };
+    const drawLandmarks = (landmarks) => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        const video = webcamRef.current.video;
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        landmarks.forEach(({ bbox, keypoints }) => {
+            // Draw bounding box
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(bbox[0], bbox[1], bbox[2], bbox[3]);
+
+            // Draw keypoints
+            ctx.fillStyle = 'red';
+            keypoints.forEach(({ x, y }) => {
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+        });
+    };
+
     const captureAndSendFrame = async () => {
         const imageSrc = webcamRef.current.getScreenshot(); // Capture frame
         if (imageSrc) {
@@ -45,6 +59,8 @@ function WebcamPage(){
               }
             });
             setEmotion(response.data.emotion); // Set the detected emotion
+            setLandmarks(response.data.landmarks);
+            drawLandmarks(response.data.landmarks);
           } catch (error) {
             console.error('Error capturing frame:', error);
           }
@@ -80,6 +96,7 @@ function WebcamPage(){
                 </button>
             </div>
             {showWebcam && (
+                <div style={{ position: 'relative' }}>
                 <Webcam
                     audio={false}
                     ref={webcamRef}
@@ -88,6 +105,19 @@ function WebcamPage(){
                     videoConstraints={{ facingMode: 'user' }}
                     style={{ width: '90%', borderRadius: '8px', marginTop: '20px' }}
                 />
+                <canvas
+                        ref={canvasRef}
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            pointerEvents: 'none',
+                        }}
+                    />
+                </div>
+
             )}
             {emotion && <h3>Detected Emotion: {emotion}</h3>}
         </div>

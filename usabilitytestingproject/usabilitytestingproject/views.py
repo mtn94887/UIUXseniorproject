@@ -107,21 +107,33 @@ def emotion_detection(request):
         results = face_detection.process(image)
 
         if results.detections:
+            landmarks_data = []
             for detection in results.detections:
                 bboxC = detection.location_data.relative_bounding_box
                 ih, iw, _ = image.shape
                 x, y, w, h = int(bboxC.xmin * iw), int(bboxC.ymin * ih), int(bboxC.width * iw), int(bboxC.height * ih)
-                face = image[y:y+h, x:x+w]
+                #face = image[y:y+h, x:x+w]
+
+                # Extract facial landmarks
+                keypoints = [
+                    {
+                        'x': int(kp.x * iw),
+                        'y': int(kp.y * ih)
+                    }
+                    for kp in detection.location_data.relative_keypoints
+                ]
+                landmarks_data.append({'bbox': [x, y, w, h], 'keypoints': keypoints})
 
                 # Use DeepFace for emotion detection on the cropped face
                 try:
+                    face = image[y:y+h, x:x+w]
                     analysis = DeepFace.analyze(face, actions=['emotion'], enforce_detection=False)
                     emotion = analysis[0]['dominant_emotion']
                 except Exception as e:
                     emotion = 'Unable to detect emotion'
-            return JsonResponse({'emotion': emotion})
+            return JsonResponse({'emotion': emotion, 'landmarks': landmarks_data})
         else:
-            return JsonResponse({'emotion': 'No face detected'})
+            return JsonResponse({'emotion': 'No face detected', 'landmarks': []})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 # @api_view(['POST'])
