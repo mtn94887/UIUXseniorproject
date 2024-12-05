@@ -20,7 +20,7 @@ function WebcamPage(){
         setShowWebcam(false); // Hide the webcam
     };
 
-    const drawLandmarks = (landmarks) => {
+    const drawLandmarks = (landmarks, emotion) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const video = webcamRef.current.video;
@@ -44,6 +44,13 @@ function WebcamPage(){
                 ctx.fill();
             });
         });
+        // Draw emotion text on the canvas
+        if (emotion) {
+            ctx.font = '30px Arial';
+            ctx.fillStyle = 'green';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Detected Emotion: ${emotion}`, canvas.width / 2, 50); // You can adjust position
+        }
     };
 
     const captureAndSendFrame = async () => {
@@ -60,7 +67,7 @@ function WebcamPage(){
             });
             setEmotion(response.data.emotion); // Set the detected emotion
             setLandmarks(response.data.landmarks);
-            drawLandmarks(response.data.landmarks);
+            drawLandmarks(response.data.landmarks, response.data.emotion);
           } catch (error) {
             console.error('Error capturing frame:', error);
           }
@@ -106,15 +113,15 @@ function WebcamPage(){
                     style={{ width: '90%', borderRadius: '8px', marginTop: '20px' }}
                 />
                 <canvas
-                        ref={canvasRef}
-                        style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            pointerEvents: 'none',
-                        }}
+                    ref={canvasRef}
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        pointerEvents: 'none',
+                    }}
                     />
                 </div>
 
