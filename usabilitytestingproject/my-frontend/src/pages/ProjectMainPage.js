@@ -3,8 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import WebcamPage from './WebcamPage';
 //for webcam 
-import Webcam from 'react-webcam';
-import { Link } from 'react-router-dom';
+
 
 
 function ProjPage() {
