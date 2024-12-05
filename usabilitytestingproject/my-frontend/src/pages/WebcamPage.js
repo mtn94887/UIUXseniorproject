@@ -15,12 +15,13 @@ function WebcamPage(){
     const canvasRef = useRef(null);
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    const emotionMapping = {
-        happy: 1,
-        sad: 2,
-        angry: 3,
-        surprised: 4,
-        neutral: 5,
+    const emotionList = ["happy", "sad", "angry", "surprised", "neutral"];
+    const emotionColors = {
+        happy: "green",
+        sad: "blue",
+        angry: "red",
+        surprised: "orange",
+        neutral: "purple",
     };
 
     const handleStartWebcam = () => {
@@ -79,14 +80,13 @@ function WebcamPage(){
             setEmotion(response.data.emotion); 
             setLandmarks(response.data.landmarks);
             drawLandmarks(response.data.landmarks, response.data.emotion);
-            setEmotionHistory((prev) => [
-                ...prev,
-                {
-                    time: new Date().toLocaleTimeString(),
-                    emotion: detectedEmotion,
-                    emotionValue: emotionMapping[detectedEmotion] || 0,
-                },
-            ]);
+           // Add binary data for all emotions
+           const newEntry = emotionList.reduce((acc, em) => {
+            acc[em] = em === detectedEmotion ? 1 : 0;
+            return acc;
+        }, { time: new Date().toLocaleTimeString() });
+
+        setEmotionHistory((prev) => [...prev, newEntry]);
           } catch (error) {
             console.error('Error capturing frame:', error);
           }
@@ -104,43 +104,39 @@ function WebcamPage(){
     // Prepare data for the chart
     const chartData = {
         labels: emotionHistory.map((data) => data.time), // X-axis: Timestamps
-        datasets: [
-            {
-                label: 'Emotion History',
-                data: emotionHistory.map((data) => data.emotionValue), // Y-axis: Emotions
-                borderColor: 'blue',
-                backgroundColor: 'rgba(173, 216, 230, 0.5)',
-                tension: 0.4,
-            },
-        ],
+        datasets: emotionList.map((emotion) => ({
+            label: emotion,
+            data: emotionHistory.map((entry) => entry[emotion] || 0),
+            borderColor: emotionColors[emotion],
+            backgroundColor: `${emotionColors[emotion]}33`, // Transparent version
+            tension: 0.4,
+            fill: false,
+        })),
     };
-
+    
     const chartOptions = {
         responsive: true,
+        scales: {
+            y: {
+                suggestedMin: 0,
+                suggestedMax: 1,
+                ticks: {
+                    stepSize: 1, // Ensure only 0 and 1 appear on Y-axis
+                },
+            },
+        },
         plugins: {
             tooltip: {
                 callbacks: {
                     label: (tooltipItem) => {
-                        const index = tooltipItem.dataIndex;
-                        return emotionHistory[index].emotion; 
-                    },
-                },
-            },
-        },
-        scales: {
-            y: {
-                ticks: {
-                    callback: (value) => {
-                        const emotion = Object.keys(emotionMapping).find(
-                            (key) => emotionMapping[key] === value
-                        );
-                        return emotion || value; 
+                        const emotion = tooltipItem.dataset.label;
+                        const value = tooltipItem.raw === 1 ? "Detected" : "Not Detected";
+                        return `${emotion}: ${value}`;
                     },
                 },
             },
         },
     };
-
 
     return (
         <div style={styles.pretty} > 
@@ -187,11 +183,11 @@ function WebcamPage(){
             )}
             {emotion && <h3>Detected Emotion: {emotion}</h3>}
             {!showWebcam && emotionHistory.length > 0 && (
-                <div style={{ marginTop: '20px' }}>
-                    <h3>Emotion History Chart</h3>
-                    <Line data={chartData} options={chartOptions} />
-                </div>
-            )}
+            <div style={{ marginTop: "20px" }}>
+                <h3>Emotion History Chart</h3>
+                <Line data={chartData} options={chartOptions} />
+            </div>
+        )}
         </div>
     );
 }
