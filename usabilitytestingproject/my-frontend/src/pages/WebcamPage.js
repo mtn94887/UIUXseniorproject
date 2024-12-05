@@ -1,23 +1,35 @@
 import Webcam from 'react-webcam';
 import React, { useState, useRef, useEffect } from 'react';
-import axios from 'axios'; // For sending HTTP requests to the backend
+import axios from 'axios'; 
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 function WebcamPage(){
-    const [showWebcam, setShowWebcam] = useState(false); // State to control webcam visibility
-    const [emotion, setEmotion] = useState(''); // State to store detected emotion
+    const [showWebcam, setShowWebcam] = useState(false); 
+    const [emotion, setEmotion] = useState(''); 
     const [landmarks, setLandmarks] = useState([]);
+    const [emotionHistory, setEmotionHistory] = useState([]); // Track history of emotions
     const webcamRef = useRef(null);
     const canvasRef = useRef(null);
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    // Function to handle the Start button click
-    const handleStartWebcam = () => {
-        setShowWebcam(true); // Show the webcam
+    const emotionMapping = {
+        happy: 1,
+        sad: 2,
+        angry: 3,
+        surprised: 4,
+        neutral: 5,
     };
 
-    // Function to handle the Stop button click
+    const handleStartWebcam = () => {
+        setShowWebcam(true); 
+        setEmotionHistory([]); // Reset history when starting webcam
+    };
+
     const handleStopWebcam = () => {
-        setShowWebcam(false); // Hide the webcam
+        setShowWebcam(false); 
     };
 
     const drawLandmarks = (landmarks, emotion) => {
@@ -31,12 +43,10 @@ function WebcamPage(){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         landmarks.forEach(({ bbox, keypoints }) => {
-            // Draw bounding box
             ctx.strokeStyle = 'blue';
             ctx.lineWidth = 2;
             ctx.strokeRect(bbox[0], bbox[1], bbox[2], bbox[3]);
 
-            // Draw keypoints
             ctx.fillStyle = 'red';
             keypoints.forEach(({ x, y }) => {
                 ctx.beginPath();
@@ -44,7 +54,7 @@ function WebcamPage(){
                 ctx.fill();
             });
         });
-        // Draw emotion text on the canvas
+        //showing emotions in the camera frame 
         if (emotion) {
             ctx.font = '30px Arial';
             ctx.fillStyle = 'green';
@@ -54,7 +64,7 @@ function WebcamPage(){
     };
 
     const captureAndSendFrame = async () => {
-        const imageSrc = webcamRef.current.getScreenshot(); // Capture frame
+        const imageSrc = webcamRef.current.getScreenshot(); 
         if (imageSrc) {
           try {
             const response = await axios.post('http://127.0.0.1:8000/emotion-detection/', {
@@ -62,26 +72,75 @@ function WebcamPage(){
             }, {
               headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken  // Include CSRF token in the request header
+                'X-CSRFToken': csrfToken  
               }
             });
-            setEmotion(response.data.emotion); // Set the detected emotion
+            const detectedEmotion = response.data.emotion;
+            setEmotion(response.data.emotion); 
             setLandmarks(response.data.landmarks);
             drawLandmarks(response.data.landmarks, response.data.emotion);
+            setEmotionHistory((prev) => [
+                ...prev,
+                {
+                    time: new Date().toLocaleTimeString(),
+                    emotion: detectedEmotion,
+                    emotionValue: emotionMapping[detectedEmotion] || 0,
+                },
+            ]);
           } catch (error) {
             console.error('Error capturing frame:', error);
           }
         }
       };
 
-    // Capture frame every second (or adjust as needed for real-time feedback)
     useEffect(() => {
         let interval;
         if (showWebcam) {
-            interval = setInterval(captureAndSendFrame, 1000); // Send frame every 1 second
+            interval = setInterval(captureAndSendFrame, 1000); 
         }
-        return () => clearInterval(interval); // Cleanup the interval when webcam is stopped
+        return () => clearInterval(interval); 
     }, [showWebcam]);
+
+    // Prepare data for the chart
+    const chartData = {
+        labels: emotionHistory.map((data) => data.time), // X-axis: Timestamps
+        datasets: [
+            {
+                label: 'Emotion History',
+                data: emotionHistory.map((data) => data.emotionValue), // Y-axis: Emotions
+                borderColor: 'blue',
+                backgroundColor: 'rgba(173, 216, 230, 0.5)',
+                tension: 0.4,
+            },
+        ],
+    };
+
+    const chartOptions = {
+        responsive: true,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: (tooltipItem) => {
+                        const index = tooltipItem.dataIndex;
+                        return emotionHistory[index].emotion; 
+                    },
+                },
+            },
+        },
+        scales: {
+            y: {
+                ticks: {
+                    callback: (value) => {
+                        const emotion = Object.keys(emotionMapping).find(
+                            (key) => emotionMapping[key] === value
+                        );
+                        return emotion || value; 
+                    },
+                },
+            },
+        },
+    };
+
 
     return (
         <div style={styles.pretty} > 
@@ -89,15 +148,15 @@ function WebcamPage(){
             <div style={styles.webcamButtonContainer}>
                 <button
                     style={styles.startButton}
-                    onClick={handleStartWebcam} // Start webcam
-                    disabled={showWebcam} // Disable when webcam is active
+                    onClick={handleStartWebcam} 
+                    disabled={showWebcam} 
                 >
                     Start Webcam
                 </button>
                 <button
                     style={styles.stopButton}
-                    onClick={handleStopWebcam} // Stop webcam
-                    disabled={!showWebcam} // Disable when webcam is inactive
+                    onClick={handleStopWebcam} 
+                    disabled={!showWebcam} 
                 >
                     Stop Webcam
                 </button>
@@ -127,6 +186,12 @@ function WebcamPage(){
 
             )}
             {emotion && <h3>Detected Emotion: {emotion}</h3>}
+            {!showWebcam && emotionHistory.length > 0 && (
+                <div style={{ marginTop: '20px' }}>
+                    <h3>Emotion History Chart</h3>
+                    <Line data={chartData} options={chartOptions} />
+                </div>
+            )}
         </div>
     );
 }
