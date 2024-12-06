@@ -15,13 +15,15 @@ function WebcamPage(){
     const canvasRef = useRef(null);
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    const emotionList = ["happy", "sad", "angry", "surprised", "neutral"];
+    const emotionList = ["happy", "sad", "angry", "surprise", "neutral", "disgust", "fear"];
     const emotionColors = {
-        happy: "green",
+        happy: "yellow",
         sad: "blue",
         angry: "red",
-        surprised: "orange",
+        surprise: "orange",
         neutral: "purple",
+        disgust: "green",
+        fear: "white",
     };
 
     const handleStartWebcam = () => {
@@ -33,36 +35,90 @@ function WebcamPage(){
         setShowWebcam(false); 
     };
 
-    const drawLandmarks = (landmarks, emotion) => {
+    // const drawLandmarks = (landmarks, emotion, boundingBox) => {
+    //     const canvas = canvasRef.current;
+    //     const ctx = canvas.getContext('2d');
+    //     const video = webcamRef.current.video;
+    
+    //     canvas.width = video.videoWidth;
+    //     canvas.height = video.videoHeight;
+    
+    //     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    //     // Draw bounding box
+    //     if (boundingBox) {
+    //          // Display detected emotion on the canvas
+    //         ctx.strokeStyle = 'blue';
+    //         ctx.lineWidth = 2;
+    //         ctx.strokeRect(
+    //             boundingBox.x,
+    //             boundingBox.y,
+    //             boundingBox.width,
+    //             boundingBox.height
+    //         );
+    //     }
+    
+    //     // Draw facial landmarks
+    //     if (landmarks.length > 0) {
+    //         ctx.fillStyle = 'green';
+    //         landmarks.forEach(({ x, y }) => {
+    //             ctx.beginPath();
+    //             ctx.arc(x, y, 2, 0, 2 * Math.PI); // Circle for each landmark
+    //             ctx.fill();
+    //         });
+    //     }
+    
+    //     // Display detected emotion on the canvas
+    //     if (emotion) {
+    //         ctx.font = '20px Arial';
+    //         ctx.fillStyle = 'green';
+    //         ctx.fillText(`Emotion: ${emotion}`, canvas.width / 2 - 50, 30);
+    //     }
+    // };
+
+    const drawLandmarks = (landmarks, emotion, boundingBox) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const video = webcamRef.current.video;
-
+    
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-
+    
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        landmarks.forEach(({ bbox, keypoints }) => {
+    
+        // Draw bounding box
+        if (boundingBox) {
             ctx.strokeStyle = 'blue';
             ctx.lineWidth = 2;
-            ctx.strokeRect(bbox[0], bbox[1], bbox[2], bbox[3]);
-
-            ctx.fillStyle = 'red';
-            keypoints.forEach(({ x, y }) => {
+            ctx.strokeRect(
+                boundingBox.x,
+                boundingBox.y,
+                boundingBox.width,
+                boundingBox.height
+            );
+    
+            // Display detected emotion on the bounding box border (near the top of the box)
+            if (emotion) {
+                ctx.font = '20px Arial';
+                ctx.fillStyle = 'blue';
+                ctx.textAlign = 'center';
+                // Adjust the position to place the text just above the bounding box
+                ctx.fillText(emotion, boundingBox.x + boundingBox.width / 2, boundingBox.y - 10);
+            }
+        }
+    
+        // Draw facial landmarks (optional)
+        if (landmarks.length > 0) {
+            ctx.fillStyle = 'green';
+            landmarks.forEach(({ x, y }) => {
                 ctx.beginPath();
-                ctx.arc(x, y, 2, 0, 2 * Math.PI);
+                ctx.arc(x, y, 2, 0, 2 * Math.PI); // Circle for each landmark
                 ctx.fill();
             });
-        });
-        //showing emotions in the camera frame 
-        if (emotion) {
-            ctx.font = '30px Arial';
-            ctx.fillStyle = 'green';
-            ctx.textAlign = 'center';
-            ctx.fillText(`Detected Emotion: ${emotion}`, canvas.width / 2, 50); // You can adjust position
         }
     };
+    
+    
 
     const captureAndSendFrame = async () => {
         const imageSrc = webcamRef.current.getScreenshot(); 
@@ -77,9 +133,14 @@ function WebcamPage(){
               }
             });
             const detectedEmotion = response.data.emotion;
+            const receivedLandmarks = response.data.landmarks;
+            const boundingBox = response.data.bounding_box;
+
+
             setEmotion(response.data.emotion); 
             setLandmarks(response.data.landmarks);
-            drawLandmarks(response.data.landmarks, response.data.emotion);
+            // drawLandmarks(response.data.landmarks, response.data.emotion);
+            drawLandmarks(receivedLandmarks, detectedEmotion, boundingBox); // Render landmarks, bounding box, and emotion
            // Add binary data for all emotions
            const newEntry = emotionList.reduce((acc, em) => {
             acc[em] = em === detectedEmotion ? 1 : 0;
