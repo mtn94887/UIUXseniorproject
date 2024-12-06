@@ -65,7 +65,7 @@ function WebcamPage(){
             // Display detected emotion on the bounding box border (near the top of the box)
             if (emotion) {
                 ctx.font = '20px Arial';
-                ctx.fillStyle = 'green';
+                ctx.fillStyle = 'red';
                 ctx.textAlign = 'center';
                 // Adjust the position to place the text just above the bounding box
                 ctx.fillText(emotion, adjustedX + adjustedWidth / 2, adjustedY - 10);
@@ -90,7 +90,7 @@ function WebcamPage(){
         
             // Draw connections (lines)
         if (connections && landmarks.length > 0) {
-            ctx.strokeStyle = 'green';
+            ctx.strokeStyle = 'red';
             ctx.lineWidth = 1;
             connections.forEach(({ start, end }) => {
                 const startPoint = landmarks[start];
@@ -106,10 +106,10 @@ function WebcamPage(){
 
         // Draw landmarks (dots)
         if (landmarks.length > 0) {
-            ctx.fillStyle = 'yellow';
+            ctx.fillStyle = 'blue';
             landmarks.forEach(({ x, y }) => {
                 ctx.beginPath();
-                ctx.arc(x, y, 0.5, 0, 2 * Math.PI); // Circle for each landmark
+                ctx.arc(x, y, 0.9, 0, 2 * Math.PI); // Circle for each landmark
                 ctx.fill();
             });
         }
