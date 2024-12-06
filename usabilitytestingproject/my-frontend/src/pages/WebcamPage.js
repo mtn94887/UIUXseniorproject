@@ -23,7 +23,7 @@ function WebcamPage(){
         surprise: "orange",
         neutral: "purple",
         disgust: "green",
-        fear: "white",
+        fear: "gray",
     };
 
     const handleStartWebcam = () => {
@@ -120,36 +120,42 @@ function WebcamPage(){
     const captureAndSendFrame = async () => {
         const imageSrc = webcamRef.current.getScreenshot(); 
         if (imageSrc) {
-          try {
-            const response = await axios.post('http://127.0.0.1:8000/emotion-detection/', {
-              image: imageSrc
-            }, {
-              headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken  
-              }
-            });
-            const detectedEmotion = response.data.emotion;
-            const receivedLandmarks = response.data.landmarks;
-            const boundingBox = response.data.bounding_box;
-            const connections = response.data.connections;
-            const emotionProbabilities = response.data.emotion_probabilities;
+            try {
+                const response = await axios.post('http://127.0.0.1:8000/emotion-detection/', {
+                image: imageSrc
+                }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken  
+                }
+                });
+                const detectedEmotion = response.data.emotion;
+                const receivedLandmarks = response.data.landmarks;
+                const boundingBox = response.data.bounding_box;
+                const connections = response.data.connections;
+                const emotionProbabilities = response.data.emotion_probabilities;
 
 
-            setEmotion(response.data.emotion); 
-            setLandmarks(response.data.landmarks);
-            // drawLandmarks(response.data.landmarks, response.data.emotion);
-            drawLandmarks(receivedLandmarks, detectedEmotion, boundingBox, connections, emotionProbabilities); // Render landmarks, bounding box, and emotion
-           // Add binary data for all emotions
-           const newEntry = emotionList.reduce((acc, em) => {
-            acc[em] = em === detectedEmotion ? 1 : 0;
-            return acc;
-        }, { time: new Date().toLocaleTimeString() });
+                setEmotion(response.data.emotion); 
+                setLandmarks(response.data.landmarks);
+                // drawLandmarks(response.data.landmarks, response.data.emotion);
+                drawLandmarks(receivedLandmarks, detectedEmotion, boundingBox, connections, emotionProbabilities); // Render landmarks, bounding box, and emotion
+            //    // Add binary data for all emotions
+            //     const newEntry = emotionList.reduce((acc, em) => {
+            //         acc[em] = em === detectedEmotion ? 1 : 0;
+            //         return acc;
+            //     }, { time: new Date().toLocaleTimeString() });
+                const newEntry = {
+                    time: new Date().toLocaleTimeString(),
+                    ...Object.fromEntries(
+                        Object.entries(emotionProbabilities).map(([key, value]) => [key, value])
+                    ),
+                };
 
-        setEmotionHistory((prev) => [...prev, newEntry]);
-          } catch (error) {
-            console.error('Error capturing frame:', error);
-          }
+                setEmotionHistory((prev) => [...prev, newEntry]);
+            } catch (error) {
+                console.error('Error capturing frame:', error);
+            }
         }
     };
 
@@ -166,7 +172,7 @@ function WebcamPage(){
         labels: emotionHistory.map((data) => data.time), // X-axis: Timestamps
         datasets: emotionList.map((emotion) => ({
             label: emotion,
-            data: emotionHistory.map((entry) => entry[emotion] || 0),
+            data: emotionHistory.map((entry) => (entry[emotion] || 0)),
             borderColor: emotionColors[emotion],
             backgroundColor: `${emotionColors[emotion]}33`, // Transparent version
             tension: 0.4,
@@ -178,10 +184,23 @@ function WebcamPage(){
         responsive: true,
         scales: {
             y: {
-                suggestedMin: 0,
-                suggestedMax: 1,
+                min: 0,
+                max: 100, // Set Y-axis range to 0% to 100%
                 ticks: {
-                    stepSize: 1, // Ensure only 0 and 1 appear on Y-axis
+                    stepSize: 25, 
+                    callback: (value) => `${value}%`, // Add percentage symbol to ticks
+                    color: 'black',
+                },
+                grid: {
+                    color: 'gray', // Gridline color
+                },
+            },
+            x: {
+                ticks: {
+                    color: 'black', // X-axis labels color
+                },
+                grid: {
+                    color: 'gray', // X-axis gridlines
                 },
             },
         },
@@ -190,11 +209,20 @@ function WebcamPage(){
                 callbacks: {
                     label: (tooltipItem) => {
                         const emotion = tooltipItem.dataset.label;
-                        const value = tooltipItem.raw === 1 ? "Detected" : "Not Detected";
+                        // const value = tooltipItem.raw === 1 ? "Detected" : "Not Detected";
+                        const value = tooltipItem.raw.toFixed(2); // Format value to two decimals
                         return `${emotion}: ${value}`;
                     },
                 },
             },
+            legend: {
+                labels: {
+                    boxWidth: 10, // Adjust to make legend squares smaller
+                    boxHeight: 10, // Ensure a square shape
+                    usePointStyle: false, // Ensure square instead of circles
+                },
+            },
+
         },
     };
 
@@ -248,9 +276,17 @@ function WebcamPage(){
             )}
             {/* {emotion && <h3>Detected Emotion: {emotion}</h3>} */}
             {!showWebcam && emotionHistory.length > 0 && (
-            <div style={{ marginTop: "20px" }}>
+            <div style={{ 
+                marginTop: "20px",
+                backgroundColor: "white",
+                padding: "20px", // Increased padding for extra space
+                borderRadius: "8px",
+                border: "1px solid #ccc", // Optional border for clarity
+                width: "90%", // Adjust width if needed
+                height: "400px", // Set a fixed height for better Y-axis visibility
+            }}>
                 <h3>Emotion History Chart</h3>
-                <Line data={chartData} options={chartOptions} />
+                <Line data={chartData} options={chartOptions} style={{ width: "100%", height: "300px" }}/>
             </div>
         )}
         </div>
