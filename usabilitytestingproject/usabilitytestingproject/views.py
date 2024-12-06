@@ -135,9 +135,8 @@ def project_detail(request, id):
 #         else:
 #             return JsonResponse({'emotion': 'No face detected', 'landmarks': []})
 #     return JsonResponse({'error': 'Invalid request'}, status=400)
-
-@csrf_exempt  # Temporarily exempt from CSRF checks
-@api_view(['POST'])  
+@csrf_exempt
+@api_view(['POST'])
 def emotion_detection(request):
     if request.method == 'POST':
         # Get the base64 image from the frontend
@@ -157,6 +156,18 @@ def emotion_detection(request):
         landmarks_data = []
         bounding_box = None
         emotion = 'No emotion detected'
+        connections = []  # To store landmark connections for drawing
+
+        # Predefined indices for specific facial regions (eyes, mouth, etc.)
+        FACE_REGIONS = {
+            'face_boundary': mp_face_mesh.FACEMESH_FACE_OVAL,
+            'left_eye': mp_face_mesh.FACEMESH_LEFT_EYE,
+            'right_eye': mp_face_mesh.FACEMESH_RIGHT_EYE,
+            'left_eyebrow': mp_face_mesh.FACEMESH_LEFT_EYEBROW,
+            'right_eyebrow': mp_face_mesh.FACEMESH_RIGHT_EYEBROW,
+            'mouth': mp_face_mesh.FACEMESH_LIPS,
+            'nose': mp_face_mesh.FACEMESH_NOSE,
+        }
 
         if results.multi_face_landmarks:
             for face_landmarks in results.multi_face_landmarks:
@@ -166,26 +177,31 @@ def emotion_detection(request):
                 max_x = 0
                 max_y = 0
 
+                # Process each landmark and calculate bounding box
                 for lm in face_landmarks.landmark:
                     x, y = int(lm.x * iw), int(lm.y * ih)
                     landmarks_data.append({'x': x, 'y': y})
-
-                    # Update bounding box coordinates
                     min_x = min(min_x, x)
                     min_y = min(min_y, y)
                     max_x = max(max_x, x)
                     max_y = max(max_y, y)
 
+                # Create the bounding box
                 bounding_box = {'x': min_x, 'y': min_y, 'width': max_x - min_x, 'height': max_y - min_y}
 
-            # Crop face for emotion analysis using DeepFace (optional)
+                # Add connections for each region
+                for region, indices in FACE_REGIONS.items():
+                    for start_idx, end_idx in indices:
+                        connections.append({'start': start_idx, 'end': end_idx})
+
+            # Perform emotion analysis using DeepFace (optional)
             try:
                 analysis = DeepFace.analyze(image, actions=['emotion'], enforce_detection=False)
                 emotion = analysis[0]['dominant_emotion']
             except Exception as e:
                 emotion = 'Unable to detect emotion'
 
-        return JsonResponse({'emotion': emotion, 'landmarks': landmarks_data, 'bounding_box': bounding_box})
+        return JsonResponse({'emotion': emotion, 'landmarks': landmarks_data, 'bounding_box': bounding_box, 'connections': connections})
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
