@@ -154,10 +154,12 @@ def emotion_detection(request):
             try:
                 analysis = DeepFace.analyze(image, actions=['emotion'], enforce_detection=False)
                 emotion = analysis[0]['dominant_emotion']
+                emotion_probabilities = analysis[0]['emotion']  # Add probabilities
             except Exception as e:
                 emotion = 'Unable to detect emotion'
+                emotion_probabilities = {}
 
-        return JsonResponse({'emotion': emotion, 'landmarks': landmarks_data, 'bounding_box': bounding_box, 'connections': connections})
+        return JsonResponse({'emotion': emotion, 'landmarks': landmarks_data, 'bounding_box': bounding_box, 'connections': connections, 'emotion_probabilities': emotion_probabilities})
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 

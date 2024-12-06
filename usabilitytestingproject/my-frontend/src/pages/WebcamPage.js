@@ -36,7 +36,7 @@ function WebcamPage(){
     };
 
 
-    const drawLandmarks = (landmarks, emotion, boundingBox, connections) => {
+    const drawLandmarks = (landmarks, emotion, boundingBox, connections, emotionProbabilities) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const video = webcamRef.current.video;
@@ -71,6 +71,22 @@ function WebcamPage(){
                 ctx.fillText(emotion, adjustedX + adjustedWidth / 2, adjustedY - 10);
             }
         }
+
+
+        // Display all emotion percentages in the top-left corner
+        if (emotionProbabilities) {
+            ctx.font = '16px Arial';
+            ctx.fillStyle = 'red';
+            ctx.textAlign = 'left';
+            let yOffset = 20; // Start position for emotion list
+
+            for (const [emotion, probability] of Object.entries(emotionProbabilities)) {
+                const percentage = (probability).toFixed(2); // Convert to percentage
+                ctx.fillText(`${emotion}: ${percentage}%`, 10, yOffset);
+                yOffset += 20; // Increment y position for next emotion
+            }
+        }
+
         
             // Draw connections (lines)
         if (connections && landmarks.length > 0) {
@@ -117,12 +133,13 @@ function WebcamPage(){
             const receivedLandmarks = response.data.landmarks;
             const boundingBox = response.data.bounding_box;
             const connections = response.data.connections;
+            const emotionProbabilities = response.data.emotion_probabilities;
 
 
             setEmotion(response.data.emotion); 
             setLandmarks(response.data.landmarks);
             // drawLandmarks(response.data.landmarks, response.data.emotion);
-            drawLandmarks(receivedLandmarks, detectedEmotion, boundingBox, connections); // Render landmarks, bounding box, and emotion
+            drawLandmarks(receivedLandmarks, detectedEmotion, boundingBox, connections, emotionProbabilities); // Render landmarks, bounding box, and emotion
            // Add binary data for all emotions
            const newEntry = emotionList.reduce((acc, em) => {
             acc[em] = em === detectedEmotion ? 1 : 0;
@@ -208,7 +225,12 @@ function WebcamPage(){
                     screenshotFormat="image/jpeg"
                     width="100%"
                     videoConstraints={{ facingMode: 'user' }}
-                    style={{ width: '90%', borderRadius: '8px', marginTop: '20px' }}
+                    style={{ 
+                        display: 'block', // Prevent video scaling issues
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '8px'
+                    }}
                 />
                 <canvas
                     ref={canvasRef}
@@ -216,8 +238,8 @@ function WebcamPage(){
                         position: 'absolute',
                         top: 0,
                         left: 0,
-                        width: '100%',
-                        height: '100%',
+                        // width: '100%',
+                        // height: '100%',
                         pointerEvents: 'none',
                     }}
                     />
