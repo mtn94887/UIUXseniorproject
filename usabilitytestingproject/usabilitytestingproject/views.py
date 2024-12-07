@@ -55,11 +55,21 @@ import base64
 from io import BytesIO
 from PIL import Image
 
+from django.core.files.storage import FileSystemStorage
+import os
+
 
 # MediaPipe setup for face detection
 mp_face_detection = mp.solutions.face_detection
 mp_drawing = mp.solutions.drawing_utils
 face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.2)
+
+# Define the path for saving uploaded files
+ASSETS_DIR = os.path.join(os.path.dirname(__file__), 'assets')
+
+# Ensure the assets directory exists
+if not os.path.exists(ASSETS_DIR):
+    os.makedirs(ASSETS_DIR)
 
 def index(request):
     return render(request, 'index.html')
@@ -205,7 +215,15 @@ def emotion_detection(request):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-
+@csrf_exempt
+def upload_photo(request):
+    if request.method == 'POST' and request.FILES.get('file'):
+        file = request.FILES['file']
+        fs = FileSystemStorage(location=ASSETS_DIR)  # Specify the save location
+        filename = fs.save(file.name, file)  # Save the uploaded file
+        file_url = f'/assets/{filename}'  # Relative URL for accessing the file
+        return JsonResponse({'file_path': file_url})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 # @csrf_exempt  # Temporarily exempt from CSRF checks

@@ -3,15 +3,17 @@ import axios from 'axios';
 
 const UploadNDisplayBioData = () => {
   const [file, setFile] = useState(null); // State to handle file input
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadedFilePath, setUploadedFilePath] = useState(''); // Path to display uploaded image
   const [error, setError] = useState('');
 
+  // Handle file input change
   const handleFileChange = (e) => {
     setFile(e.target.files[0]); // Set the selected file
-    setUploadSuccess(false); // Reset success message
+    setUploadedFilePath(''); // Reset the displayed file path
     setError(''); // Reset error message
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
@@ -20,36 +22,37 @@ const UploadNDisplayBioData = () => {
     }
 
     const formData = new FormData();
-    formData.append('biometric_data', file);
+    formData.append('file', file); // Adjust the key name to match backend expectations
 
     try {
-      await axios.post('http://127.0.0.1:8000/upload-bio-data/', formData, {
+      const response = await axios.post('http://127.0.0.1:8000/upload-photo/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setUploadSuccess(true);
+      setUploadedFilePath(response.data.file_path); // Assume backend returns the file path
       setError('');
     } catch (err) {
-      console.error('Error uploading biometric data:', err);
-      setError('Failed to upload the biometric data. Please try again.');
+      console.error('Error uploading file:', err);
+      setError('Failed to upload the file. Please try again.');
     }
   };
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>Upload and Display Biometric Data</h2>
+      <h2 style={styles.title}>Upload and Display Photo</h2>
       <form onSubmit={handleSubmit} style={styles.form}>
         <label style={styles.label}>
-          Select Biometric Data File:
-          <input type="file" onChange={handleFileChange} style={styles.input} />
+          Select Photo:
+          <input type="file" accept="image/*" onChange={handleFileChange} style={styles.input} />
         </label>
         <button type="submit" style={styles.uploadButton}>
           Upload
         </button>
       </form>
 
-      {uploadSuccess && (
-        <div style={styles.successMessage}>
-          Biometric data uploaded successfully!
+      {uploadedFilePath && (
+        <div style={styles.imageContainer}>
+          <h3>Uploaded Photo:</h3>
+          <img src={`${uploadedFilePath}`} alt="Uploaded" style={styles.image} />
         </div>
       )}
       {error && <div style={styles.errorMessage}>{error}</div>}
@@ -91,9 +94,14 @@ const styles = {
     borderRadius: '4px',
     cursor: 'pointer',
   },
-  successMessage: {
+  imageContainer: {
     marginTop: '20px',
-    color: 'green',
+  },
+  image: {
+    maxWidth: '100%',
+    maxHeight: '300px',
+    border: '2px solid #61dafb',
+    borderRadius: '5px',
   },
   errorMessage: {
     marginTop: '20px',

@@ -43,11 +43,16 @@ Including another URLconf
 # ]
 
 
+import os
 from django.contrib import admin 
 from django.urls import path 
 from . import views 
 from django.views.generic import TemplateView
 from django.urls import re_path
+
+from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -59,6 +64,9 @@ urlpatterns = [
     path('list-tasks/', views.list_tasks, name='list_tasks'),  # Add this line for the task listing API
     path('delete-task/<int:task_id>/', views.delete_task, name='delete_task'),
     path('emotion-detection/', views.emotion_detection, name='emotion_detection'),
+    path('upload-photo/', views.upload_photo, name='upload_photo'),
+
     re_path(r'^(?!admin).*$', TemplateView.as_view(template_name='index.html')),
 ]
 
+urlpatterns += static('/assets/', document_root=os.path.join(os.path.dirname(__file__), 'assets'))
