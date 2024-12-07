@@ -256,106 +256,124 @@ const BiometricData = () => {
 
 
     return (
-        <div style={styles.pretty} > 
-            <h2 style={styles.header}>Webcam Control</h2>
-            <h1>Biometric Data for Task ID: {taskId}</h1>
-            <div>
-                <label htmlFor="device-select" style={{color:'white', alignItems: 'center'}}>Select Camera:</label>
-                <select
-                    id="device-select"
-                    onChange={handleDeviceChange}
-                    value={selectedDeviceId || ''}
-                >
-                    {devices.map((device) => (
-                        <option key={device.deviceId} value={device.deviceId}>
-                            {device.label || `Camera ${device.deviceId}`}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <h></h>
-            <div style={styles.webcamButtonContainer}>
-                <button
-                    style={styles.startButton}
-                    onClick={handleStartWebcam} 
-                    disabled={showWebcam} 
-                >
-                    Start Webcam
-                </button>
-                <button
-                    style={styles.stopButton}
-                    onClick={handleStopWebcam} 
-                    disabled={!showWebcam} 
-                >
-                    Stop Webcam
-                </button>
-            </div>
-            {showWebcam &&  selectedDeviceId && (
-                <div style={{ position: 'relative' }}>
-                <Webcam
-                    audio={false}
-                    ref={webcamRef}
-                    screenshotFormat="image/jpeg"
-                    width="100%"
-                    videoConstraints={{ facingMode: 'user', deviceId: selectedDeviceId}}
-                    style={{ 
-                        display: 'block', // Prevent video scaling issues
-                        width: '100%',
-                        height: '100%',
-                        borderRadius: '8px'
-                    }}
-                />
-                <canvas
-                    ref={canvasRef}
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        // width: '100%',
-                        // height: '100%',
-                        pointerEvents: 'none',
-                    }}
-                    />
+        <div style={styles.container}>
+            {/* Left Side: Controls */}
+            <div style={styles.leftSection}>
+                <h2 style={styles.header}>Webcam Control</h2>
+                <h1>Biometric Data for Task ID: {taskId}</h1>
+                <div>
+                    <label htmlFor="device-select" style={{ color: 'white' }}>Select Camera:</label>
+                    <select
+                        id="device-select"
+                        onChange={handleDeviceChange}
+                        value={selectedDeviceId || ''}
+                        style={styles.select}
+                    >
+                        {devices.map((device) => (
+                            <option key={device.deviceId} value={device.deviceId}>
+                                {device.label || `Camera ${device.deviceId}`}
+                            </option>
+                        ))}
+                    </select>
                 </div>
+                <div style={styles.webcamButtonContainer}>
+                    <button
+                        style={styles.startButton}
+                        onClick={handleStartWebcam}
+                        disabled={showWebcam}
+                    >
+                        Start Webcam
+                    </button>
+                    <button
+                        style={styles.stopButton}
+                        onClick={handleStopWebcam}
+                        disabled={!showWebcam}
+                    >
+                        Stop Webcam
+                    </button>
+                </div>
+            </div>
 
-            )}
-            {/* {emotion && <h3>Detected Emotion: {emotion}</h3>} */}
-            {!showWebcam && emotionHistory.length > 0 && (
-                <div style={{ 
-                    marginTop: "20px",
-                    backgroundColor: "white",
-                    padding: "20px", // Increased padding for extra space
-                    borderRadius: "8px",
-                    border: "1px solid #ccc", // Optional border for clarity
-                    width: "1000px", // Adjust width if needed
-                    height: "600px", // Set a fixed height for better Y-axis visibility
-                }}>
-                    <h3>Emotion History Chart</h3>
-                    <Line data={chartData} options={chartOptions} style={{ width: "100%", height: "500px" }} />
-                </div>
-            )}
+            {/* Right Side: Webcam and Chart */}
+            <div style={styles.rightSection}>
+                {showWebcam && selectedDeviceId && (
+                    <div style={{ position: 'relative' }}>
+                        <Webcam
+                            audio={false}
+                            ref={webcamRef}
+                            screenshotFormat="image/jpeg"
+                            videoConstraints={{
+                                facingMode: 'user',
+                                deviceId: selectedDeviceId,
+                            }}
+                            style={{
+                                display: 'block',
+                                width: '100%',
+                                height: '100%',
+                                borderRadius: '8px',
+                            }}
+                        />
+                        <canvas
+                            ref={canvasRef}
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                pointerEvents: 'none',
+                            }}
+                        />
+                    </div>
+                )}
+                {!showWebcam && emotionHistory.length > 0 && (
+                    <div style={styles.chartContainer}>
+                        <h3>Emotion History Chart</h3>
+                        <Line data={chartData} options={chartOptions} style={{ width: '100%', height: '500px' }} />
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
 
 
 const styles = {
-    pretty:{
-        color:'#282c34',
+    container: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        height: '100vh',
+        padding: '20px',
+        backgroundColor: '#282c34',
+        color: 'white',
+    },
+    leftSection: {
+        flex: '1',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        padding: '20px',
+        gap: '20px',
+        borderRight: '2px solid #ccc', // Optional border for separation
+    },
+    rightSection: {
+        flex: '2',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        padding: '20px',
     },
     header: {
         fontSize: '2em',
         fontWeight: 'bold',
-        color: 'white', 
         marginBottom: '20px',
-        alignItems: 'center', 
     },
     webcamButtonContainer: {
         display: 'flex',
         flexDirection: 'column',
         gap: '20px',
         width: '100%',
-        alignItems: 'center',
     },
     startButton: {
         backgroundColor: '#61dafb',
@@ -379,6 +397,23 @@ const styles = {
         fontWeight: 'bold',
         width: '80%',
     },
-}
+    chartContainer: {
+        marginTop: '20px',
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        border: '1px solid #ccc',
+        width: '100%',
+        maxWidth: '1000px',
+        height: '600px',
+    },
+    select: {
+        margin: '10px 0',
+        padding: '8px',
+        borderRadius: '4px',
+        border: '1px solid #ccc',
+        width: '80%',
+    },
+};
 
 export default BiometricData;
