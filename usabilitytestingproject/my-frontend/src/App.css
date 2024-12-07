@@ -1,10 +1,4 @@
-/* Wraps both box-container elements side by side */
-.boxes-wrapper {
-  display: flex;
-  justify-content: center;
-  gap: 30px; /* Adds space between the two box containers */
-  margin-top: 20px; /* Optional, for some spacing between the header and boxes */
-}
+
 
 /* Centers the entire App */
 .App {
@@ -12,9 +6,18 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh; 
   background-color: #546179;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
   /* background-image: url('./assets/111background-3.png'); */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-y: auto; /* Allow the page to scroll if content overflows */
 }
 
 /* Centers the header content */
@@ -29,11 +32,21 @@ h1 {
   margin-bottom: 20px;
 }
 
+/* Wraps both box-container elements side by side */
+.boxes-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 30px; /* Adds space between the two box containers */
+  margin-top: 20px; /* Optional, for some spacing between the header and boxes */
+  flex-wrap: wrap;
+}
+
 /* Container to hold each box and label pair */
 .box-container {
   display: flex;
   gap: 20px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 /* Styles each box-item container to align box and label vertically */
@@ -41,6 +54,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 10px;
 }
 
 /* Styles each box */

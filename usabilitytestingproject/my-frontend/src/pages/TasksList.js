@@ -115,9 +115,13 @@ const TasksList = () => {
     }
   };
 
-  const seeBiometricData = (taskId) => {
-    navigate(`/biometric-data/${taskId}`); // Navigate to the biometric data page with the task ID
-  };
+    const collectBiometricData = () => {
+        window.open(`/webcam-page`, '_blank');    
+    }
+
+    const uploadBiometricData = (taskId) => {
+        navigate(`/upload-display-bio-data/${taskId}`);    
+    }
 
   const gotoTaskForm = async() => {
     navigate('/task-form'); 
@@ -135,8 +139,9 @@ const TasksList = () => {
   return (
     <div style={{ color: 'white', padding: '20px', margin: '0 auto', maxWidth: '800px' }}>
       <h2>Tasks List</h2>
-      <button onClick={gotoTaskForm} >Go back to task form to create a new one</button>
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+      <button onClick={collectBiometricData} >Go to webcam page to collect facial emotion</button>
+
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px', marginBottom: '20px' }}>
         <thead style={{ color: 'green' }}>
           <tr>
             <th style={styles.tableHeader}>Task ID</th>
@@ -144,7 +149,7 @@ const TasksList = () => {
             <th style={styles.tableHeader}>Task Name</th>
             <th style={styles.tableHeader}>Participant Name</th>
             <th style={styles.tableHeader}>Delete</th>
-            <th style={styles.tableHeader}>See Biometric data</th>
+            <th style={styles.tableHeader}>Upload the Biometric data</th>
           </tr>
         </thead>
         <tbody>
@@ -163,17 +168,18 @@ const TasksList = () => {
                 </button>
               </td>
               <td style={styles.tableCell}>
-              <button
-                  onClick={() => seeBiometricData(task.id)}
+                <button
+                  onClick={() => uploadBiometricData(task.id)}
                   style={styles.biometricButton}
                 >
-                  Go to Biometric data page
+                  Upload biometric data 
                 </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <button onClick={gotoTaskForm} >Go back to task form to create a new one</button>
     </div>
   );
 };

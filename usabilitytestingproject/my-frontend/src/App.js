@@ -10,6 +10,7 @@ import WebcamPage from './pages/WebcamPage';
 import TaskForm from './pages/TasksForm';
 import TasksList from './pages/TasksList';
 import BiometricData from './pages/BiometricData';
+import UploadNDisplayBioData from './pages/UploadNDispalyBioData';
 
 function App() {
   return (
@@ -37,6 +38,8 @@ function App() {
           <Route path="/task-list" element={<TasksList />} />
 
           <Route path="/biometric-data/:taskId" element={<BiometricData />} />
+
+          <Route path="/upload-display-bio-data/:taskId" element={<UploadNDisplayBioData />} />
 
         </Routes>
       </div>
