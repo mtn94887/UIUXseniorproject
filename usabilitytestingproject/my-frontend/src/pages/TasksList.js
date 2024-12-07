@@ -73,12 +73,14 @@
 // export default TasksList;
 
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const TasksList = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate(); // Hook to navigate between routes
 
   // Fetch tasks from the backend when the component is mounted
   useEffect(() => {
@@ -112,6 +114,10 @@ const TasksList = () => {
       alert('Failed to delete the task.');
     }
   };
+
+  const seeBiometricData = (taskId) => {
+    navigate(`/biometric-data/${taskId}`); // Navigate to the biometric data page with the task ID
+  };
   
 
   if (loading) {
@@ -128,15 +134,18 @@ const TasksList = () => {
       <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
         <thead style={{ color: 'green' }}>
           <tr>
+            <th style={styles.tableHeader}>Task ID</th>
             <th style={styles.tableHeader}>Task Number</th>
             <th style={styles.tableHeader}>Task Name</th>
             <th style={styles.tableHeader}>Participant Name</th>
             <th style={styles.tableHeader}>Delete</th>
+            <th style={styles.tableHeader}>See Biometric data</th>
           </tr>
         </thead>
         <tbody>
           {tasks.map((task) => (
             <tr key={task.id}>
+              <td style={styles.tableCell}>{task.id}</td>
               <td style={styles.tableCell}>{task.task_number}</td>
               <td style={styles.tableCell}>{task.task_name}</td>
               <td style={styles.tableCell}>{task.participant_name}</td>
@@ -146,6 +155,14 @@ const TasksList = () => {
                   style={styles.deleteButton}
                 >
                   Delete
+                </button>
+              </td>
+              <td style={styles.tableCell}>
+              <button
+                  onClick={() => seeBiometricData(task.id)}
+                  style={styles.biometricButton}
+                >
+                  Go to Biometric data page
                 </button>
               </td>
             </tr>
@@ -175,6 +192,14 @@ const styles = {
     borderRadius: '4px',
     cursor: 'pointer',
   },
+  biometricButton: {
+    padding: '5px 10px',
+    backgroundColor: 'green',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  }
 };
 
 export default TasksList;

@@ -9,6 +9,7 @@ import ProjectLists from './pages/ProjectLists';
 import WebcamPage from './pages/WebcamPage';
 import TaskForm from './pages/TasksForm';
 import TasksList from './pages/TasksList';
+import BiometricData from './pages/BiometricData';
 
 function App() {
   return (
@@ -34,6 +35,8 @@ function App() {
           <Route path="/task-form" element={<TaskForm />} />
 
           <Route path="/task-list" element={<TasksList />} />
+
+          <Route path="/biometric-data/:taskId" element={<BiometricData />} />
 
         </Routes>
       </div>
