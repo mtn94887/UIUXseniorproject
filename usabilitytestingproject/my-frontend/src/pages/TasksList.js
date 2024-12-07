@@ -118,6 +118,10 @@ const TasksList = () => {
   const seeBiometricData = (taskId) => {
     navigate(`/biometric-data/${taskId}`); // Navigate to the biometric data page with the task ID
   };
+
+  const gotoTaskForm = async() => {
+    navigate('/task-form'); 
+  }
   
 
   if (loading) {
@@ -131,6 +135,7 @@ const TasksList = () => {
   return (
     <div style={{ color: 'white', padding: '20px', margin: '0 auto', maxWidth: '800px' }}>
       <h2>Tasks List</h2>
+      <button onClick={gotoTaskForm} >Go back to task form to create a new one</button>
       <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
         <thead style={{ color: 'green' }}>
           <tr>

@@ -31,11 +31,15 @@ function TaskForm() {
     }
   };
 
+  const gotoTaskList = async() => {
+    navigate('/task-list'); 
+  }
+
   return (
     <div style={styles.app}>
       <header style={styles.header}>
         <h1>Task Form</h1>
-
+        <button onClick={gotoTaskList}>See the task list</button>
         {/* Task Number Component */}
         <div style={styles.boxContainer}>
           <div style={styles.boxItem}>
@@ -111,6 +115,7 @@ const styles = {
     boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
   },
   boxContainer: {
+    marginTop: '20px',
     marginBottom: '20px',
   },
   boxItem: {

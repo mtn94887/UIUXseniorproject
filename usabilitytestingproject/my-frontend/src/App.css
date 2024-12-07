@@ -13,8 +13,8 @@
   justify-content: center;
   flex-direction: column;
   height: 100vh;
-  background-color: #474f5f;
-  background-image: url('./assets/111background-3.png');
+  background-color: #546179;
+  /* background-image: url('./assets/111background-3.png'); */
 }
 
 /* Centers the header content */
