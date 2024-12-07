@@ -39,8 +39,8 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Project
-from .serializers import ProjectSerializer
+from .models import Project,Task 
+from .serializers import ProjectSerializer, TaskSerializer
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -73,6 +73,27 @@ def create_project(request):
     print(serializer.errors)
     return Response(serializer.errors, status=400)
 
+@api_view(['POST'])
+def submit_task(request):
+    # Parse task data from request
+    task_number = request.data.get('task_number')
+    task_name = request.data.get('task_name')
+    participant_name = request.data.get('participant_name')
+
+    # Validate fields
+    if not task_number or not task_name or not participant_name:
+        return JsonResponse({'error': 'All fields are required.'}, status=400)
+
+    # Create new task
+    task = Task.objects.create(
+        task_number=task_number,
+        task_name=task_name,
+        participant_name=participant_name,
+    )
+
+    # Return a success message
+    return JsonResponse({'message': 'Task submitted successfully!'}, status=201)
+
 @api_view(['GET'])
 def list_projects(request):
     projects = Project.objects.all()
@@ -89,6 +110,27 @@ def project_detail(request, id):
         'description': project.description,
         'sample_size': project.sample_size,
     })
+
+@csrf_exempt
+@api_view(['POST'])
+def submit_task(request):
+    serializer = TaskSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse({'message': 'Task submitted successfully!'}, status=201)
+    return JsonResponse(serializer.errors, status=400)
+
+@api_view(['GET'])
+def list_tasks(request):
+    tasks = Task.objects.all()  # Fetch all tasks from the database
+    serializer = TaskSerializer(tasks, many=True)  # Serialize the tasks
+    return JsonResponse(serializer.data, safe=False)  # Return tasks as JSON response
+
+@api_view(['DELETE'])
+def delete_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    task.delete()  # Delete the task from the database
+    return Response({'message': 'Task deleted successfully!'}, status=204)
 
 
 @csrf_exempt

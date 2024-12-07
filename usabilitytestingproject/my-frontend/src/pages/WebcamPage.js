@@ -26,6 +26,28 @@ function WebcamPage(){
         fear: "gray",
     };
 
+    const [devices, setDevices] = useState([]);
+    const [selectedDeviceId, setSelectedDeviceId] = useState(null);
+
+    // Enumerate devices and filter for video inputs
+    useEffect(() => {
+        const getDevices = async () => {
+            const allDevices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = allDevices.filter(device => device.kind === 'videoinput');
+            setDevices(videoDevices);
+            if (videoDevices.length > 0) {
+                setSelectedDeviceId(videoDevices[0].deviceId); // Default to the first device
+            }
+        };
+
+        getDevices();
+    }, []);
+
+    // Handle device selection
+    const handleDeviceChange = (event) => {
+        setSelectedDeviceId(event.target.value);
+    };
+
     const handleStartWebcam = () => {
         setShowWebcam(true); 
         setEmotionHistory([]); // Reset history when starting webcam
@@ -229,6 +251,21 @@ function WebcamPage(){
     return (
         <div style={styles.pretty} > 
             <h2 style={styles.header}>Webcam Control</h2>
+            <div>
+                <label htmlFor="device-select" style={{color:'white', alignItems: 'center'}}>Select Camera:</label>
+                <select
+                    id="device-select"
+                    onChange={handleDeviceChange}
+                    value={selectedDeviceId || ''}
+                >
+                    {devices.map((device) => (
+                        <option key={device.deviceId} value={device.deviceId}>
+                            {device.label || `Camera ${device.deviceId}`}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <h></h>
             <div style={styles.webcamButtonContainer}>
                 <button
                     style={styles.startButton}
@@ -245,14 +282,14 @@ function WebcamPage(){
                     Stop Webcam
                 </button>
             </div>
-            {showWebcam && (
+            {showWebcam &&  selectedDeviceId && (
                 <div style={{ position: 'relative' }}>
                 <Webcam
                     audio={false}
                     ref={webcamRef}
                     screenshotFormat="image/jpeg"
                     width="100%"
-                    videoConstraints={{ facingMode: 'user' }}
+                    videoConstraints={{ facingMode: 'user', deviceId: selectedDeviceId}}
                     style={{ 
                         display: 'block', // Prevent video scaling issues
                         width: '100%',
@@ -301,7 +338,9 @@ const styles = {
     header: {
         fontSize: '2em',
         fontWeight: 'bold',
+        color: 'white', 
         marginBottom: '20px',
+        alignItems: 'center', 
     },
     webcamButtonContainer: {
         display: 'flex',

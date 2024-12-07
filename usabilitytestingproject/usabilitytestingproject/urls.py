@@ -55,6 +55,9 @@ urlpatterns = [
     path('create-project/', views.create_project, name='create_project'),
     path('list-projects/', views.list_projects, name='list_projects'),
     path('list-projects/<int:id>/', views.project_detail, name='project_detail'),  
+    path('submit-task/', views.submit_task, name='submit_task'),
+    path('list-tasks/', views.list_tasks, name='list_tasks'),  # Add this line for the task listing API
+    path('delete-task/<int:task_id>/', views.delete_task, name='delete_task'),
     path('emotion-detection/', views.emotion_detection, name='emotion_detection'),
     re_path(r'^(?!admin).*$', TemplateView.as_view(template_name='index.html')),
 ]

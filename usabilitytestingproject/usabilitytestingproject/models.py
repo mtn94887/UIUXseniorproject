@@ -9,3 +9,11 @@ class Project(models.Model):
 
     def __str__(self):
         return self.project_name
+
+class Task(models.Model):
+    task_number = models.CharField(max_length=50)
+    task_name = models.CharField(max_length=255)
+    participant_name = models.CharField(max_length=255)
+    
+    def __str__(self):
+        return self.task_name

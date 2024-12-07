@@ -26,6 +26,14 @@ function HomePage(){
                         <p className="box-label">Continue with the previous projects</p>
                     </Link>
                 </div>
+                <div className="box-container">
+                    <Link to="/task-form" className="box-item">
+                        <div className="box">
+                        <span className="plus-sign">**</span>
+                        </div>
+                        <p className="box-label">Fill the tasks</p>
+                    </Link>
+                </div>
             </div>
             
         </div>

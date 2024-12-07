@@ -7,6 +7,8 @@ import ProjPage from './pages/ProjectMainPage';
 import HomePage from './pages/HomePage'; // Import the edit icon from react-icons
 import ProjectLists from './pages/ProjectLists';
 import WebcamPage from './pages/WebcamPage';
+import TaskForm from './pages/TasksForm';
+import TasksList from './pages/TasksList';
 
 function App() {
   return (
@@ -28,6 +30,10 @@ function App() {
           <Route path="/project-main-page/:id" element={<ProjPage />} />
 
           <Route path="/webcam-page" element={<WebcamPage />} />
+
+          <Route path="/task-form" element={<TaskForm />} />
+
+          <Route path="/task-list" element={<TasksList />} />
 
         </Routes>
       </div>
