@@ -1,4 +1,5 @@
 import Webcam from 'react-webcam';
+import { CameraOff } from "lucide-react";
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios'; 
 import { Line } from 'react-chartjs-2';
@@ -6,15 +7,15 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-function WebcamPage(){
+function TempWebcam(){
     const [showWebcam, setShowWebcam] = useState(false); 
+    const [webcamSize, setWebcamSize] = useState({ width: 0, height: 0 });
     const [emotion, setEmotion] = useState(''); 
     const [landmarks, setLandmarks] = useState([]);
     const [emotionHistory, setEmotionHistory] = useState([]); // Track history of emotions
     const webcamRef = useRef(null);
     const canvasRef = useRef(null);
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
     const emotionList = ["happy", "sad", "angry", "surprise", "neutral", "disgust", "fear"];
     const emotionColors = {
         happy: "yellow",
@@ -25,7 +26,6 @@ function WebcamPage(){
         disgust: "green",
         fear: "gray",
     };
-
     const [devices, setDevices] = useState([]);
     const [selectedDeviceId, setSelectedDeviceId] = useState(null);
 
@@ -39,26 +39,28 @@ function WebcamPage(){
                 setSelectedDeviceId(videoDevices[0].deviceId); // Default to the first device
             }
         };
-
         getDevices();
     }, []);
 
-    // Handle device selection
+    // Handle webcam selection
     const handleDeviceChange = (event) => {
         setSelectedDeviceId(event.target.value);
     };
 
+    // Start the camera 
     const handleStartWebcam = () => {
-        console.log("Start Webcam button clicked!"); 
+        console.log("Start Webcam Clicked, showWebcam:", showWebcam);
         setShowWebcam(true); 
-        setEmotionHistory([]); // Reset history when starting webcam
+        setEmotionHistory([]);
     };
 
+    // Close the camera 
     const handleStopWebcam = () => {
+        console.log("Stop Webcam Clicked, showWebcam:", showWebcam);
         setShowWebcam(false); 
     };
 
-
+    // drawing facial landmarks on camera 
     const drawLandmarks = (landmarks, emotion, boundingBox, connections, emotionProbabilities) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -95,7 +97,6 @@ function WebcamPage(){
             }
         }
 
-
         // Display all emotion percentages in the top-left corner
         if (emotionProbabilities) {
             ctx.font = '16px Arial';
@@ -110,7 +111,6 @@ function WebcamPage(){
             }
         }
 
-        
         // Draw connections (lines)
         if (connections && landmarks.length > 0) {
             ctx.strokeStyle = 'red';
@@ -163,11 +163,7 @@ function WebcamPage(){
                 setLandmarks(response.data.landmarks);
                 // drawLandmarks(response.data.landmarks, response.data.emotion);
                 drawLandmarks(receivedLandmarks, detectedEmotion, boundingBox, connections, emotionProbabilities); // Render landmarks, bounding box, and emotion
-            //    // Add binary data for all emotions
-            //     const newEntry = emotionList.reduce((acc, em) => {
-            //         acc[em] = em === detectedEmotion ? 1 : 0;
-            //         return acc;
-            //     }, { time: new Date().toLocaleTimeString() });
+        
                 const newEntry = {
                     time: new Date().toLocaleTimeString(),
                     ...Object.fromEntries(
@@ -203,6 +199,7 @@ function WebcamPage(){
         })),
     };
     
+    //Chart Option
     const chartOptions = {
         responsive: true,
         scales: {
@@ -251,7 +248,11 @@ function WebcamPage(){
 
     return (
         <div style={styles.pretty} > 
-            <h2 style={styles.header}>Webcam Control</h2>
+
+            {/* title */}
+            <h2 style={styles.header}>Facial Expression Recognition</h2>
+
+            {/* webcam selection */}
             <div>
                 <label htmlFor="device-select" style={{color:'white', alignItems: 'center'}}>Select Camera:</label>
                 <select
@@ -266,24 +267,29 @@ function WebcamPage(){
                     ))}
                 </select>
             </div>
+
             <h></h>
+
+            {/* start and stop camera button  */}
             <div style={styles.webcamButtonContainer}>
                 <button
                     style={styles.startButton}
                     onClick={handleStartWebcam} 
-                    // disabled={showWebcam} 
+                    disabled={showWebcam} 
                 >
                     Start Webcam
                 </button>
                 <button
                     style={styles.stopButton}
                     onClick={handleStopWebcam} 
-                    // disabled={!showWebcam} 
+                    disabled={!showWebcam} 
                 >
                     Stop Webcam
                 </button>
             </div>
-            {showWebcam &&  selectedDeviceId && (
+
+
+            {/* {showWebcam &&  selectedDeviceId && (
                 <div style={{ position: 'relative' }}>
                 <Webcam
                     audio={false}
@@ -310,9 +316,78 @@ function WebcamPage(){
                     }}
                     />
                 </div>
+            )} */}
 
-            )}
+            {/* {selectedDeviceId && (
+                <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: 'white', borderRadius: '8px' }}>
+                    {showWebcam ? (
+                        <>
+                            <Webcam
+                                audio={false}
+                                ref={webcamRef}
+                                screenshotFormat="image/jpeg"
+                                width="100%"
+                                videoConstraints={{ facingMode: 'user', deviceId: selectedDeviceId }}
+                                style={{ display: 'block', width: '100%', height: '100%', borderRadius: '8px' }}
+                            />
+                            <canvas
+                                ref={canvasRef}
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    pointerEvents: 'none',
+                                }}
+                            />
+                        </>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            
+                            <CameraOff size={50} color="gray" />
+                            <p style={{ color: 'gray', fontSize: '1.2em', marginTop: '10px' }}>Camera Off</p>
+                        </div>
+                    )}
+                </div>
+            )} */}
+
+{selectedDeviceId && (
+    <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: 'white', borderRadius: '8px' }}>
+        {showWebcam ? (
+            <>
+                <Webcam
+                    audio={false}
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                    width="100%"
+                    videoConstraints={{ facingMode: 'user', deviceId: selectedDeviceId }}
+                    style={{ display: 'block', width: '100%', height: '100%', borderRadius: '8px' }}
+                />
+                <canvas
+                    ref={canvasRef}
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',  // Ensures canvas matches the webcam width
+                        height: '100%', // Ensures canvas matches the webcam height
+                        pointerEvents: 'none',
+                        borderRadius: '8px', // Optional for the same rounded border
+                    }}
+                />
+            </>
+        ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+                <CameraOff size={50} color="gray" />
+                <p style={{ color: 'gray', fontSize: '1.2em', marginTop: '10px' }}>Camera Off</p>
+            </div>
+        )}
+    </div>
+)}
+
+
+
             {/* {emotion && <h3>Detected Emotion: {emotion}</h3>} */}
+
             {!showWebcam && emotionHistory.length > 0 && (
                 <div style={{ 
                     marginTop: "20px",
@@ -328,11 +403,12 @@ function WebcamPage(){
                     
                 </div>
             )}
-            <h style={{color: 'white', padding: '20px', alignItems: 'center'}}>Please take screenshot of the emotion history chart before refreshing or closing the tab or record another session</h>
         </div>
     );
 }
 
+
+//CSS code
 const styles = {
     pretty:{
         color:'#282c34',
@@ -340,7 +416,7 @@ const styles = {
     header: {
         fontSize: '2em',
         fontWeight: 'bold',
-        color: 'white', 
+        color: 'black', 
         marginBottom: '20px',
         alignItems: 'center', 
     },
@@ -361,7 +437,6 @@ const styles = {
         cursor: 'pointer',
         fontWeight: 'bold',
         width: '80%',
-        zIndex: 9999,
     },
     stopButton: {
         backgroundColor: '#61dafb',
@@ -376,4 +451,4 @@ const styles = {
     },
 }
 
-export default WebcamPage;
+export default TempWebcam;

@@ -64,6 +64,7 @@ urlpatterns = [
     path('list-tasks/', views.list_tasks, name='list_tasks'),  # Add this line for the task listing API
     path('delete-task/<int:task_id>/', views.delete_task, name='delete_task'),
     path('emotion-detection/', views.emotion_detection, name='emotion_detection'),
+    path('emotion-detection-light/', views.emotion_detection_lightweight, name='emotion_detection_lightweight'),
     path('upload-photo/', views.upload_photo, name='upload_photo'),
 
     re_path(r'^(?!admin).*$', TemplateView.as_view(template_name='index.html')),

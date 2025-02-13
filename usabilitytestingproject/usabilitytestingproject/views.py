@@ -55,6 +55,10 @@ import base64
 from io import BytesIO
 from PIL import Image
 
+import threading
+import time
+
+
 from django.core.files.storage import FileSystemStorage
 import os
 
@@ -62,7 +66,13 @@ import os
 # MediaPipe setup for face detection
 mp_face_detection = mp.solutions.face_detection
 mp_drawing = mp.solutions.drawing_utils
-face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.2)
+# face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.2) #heavy-weight
+face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.3) #light weight
+
+# Use a global variable to cache emotion
+last_detected_emotion = None #lightweight
+emotion_last_updated = time.time() #lightweight
+
 
 # Define the path for saving uploaded files
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), 'assets')
@@ -142,7 +152,7 @@ def delete_task(request, task_id):
     task.delete()  # Delete the task from the database
     return Response({'message': 'Task deleted successfully!'}, status=204)
 
-
+# heavy weight code 
 @csrf_exempt
 @api_view(['POST'])
 def emotion_detection(request):
@@ -214,6 +224,120 @@ def emotion_detection(request):
         return JsonResponse({'emotion': emotion, 'landmarks': landmarks_data, 'bounding_box': bounding_box, 'connections': connections, 'emotion_probabilities': emotion_probabilities})
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+# light wegiht 
+@csrf_exempt
+@api_view(['POST'])
+def emotion_detection_lightweight(request):
+    if request.method == 'POST':
+        # Get the base64 image from the frontend
+        image_data = request.data.get('image').split(',')[1]  # Remove the base64 prefix
+        image_bytes = base64.b64decode(image_data)
+        
+        # Convert the bytes to an OpenCV image
+        image = Image.open(BytesIO(image_bytes))
+        image = np.array(image)
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # Convert to BGR format for OpenCV
+
+        # Use MediaPipe Face Mesh for detailed facial landmarks
+        mp_face_mesh = mp.solutions.face_mesh
+        face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, min_detection_confidence=0.5)
+        results = face_mesh.process(image)
+
+        landmarks_data = []
+        bounding_box = None
+        emotion = 'No emotion detected'
+        connections = []  # To store landmark connections for drawing
+
+        # Predefined indices for specific facial regions (eyes, mouth, etc.)
+        FACE_REGIONS = {
+            'face_boundary': mp_face_mesh.FACEMESH_FACE_OVAL,
+            'left_eye': mp_face_mesh.FACEMESH_LEFT_EYE,
+            'right_eye': mp_face_mesh.FACEMESH_RIGHT_EYE,
+            'left_eyebrow': mp_face_mesh.FACEMESH_LEFT_EYEBROW,
+            'right_eyebrow': mp_face_mesh.FACEMESH_RIGHT_EYEBROW,
+            'mouth': mp_face_mesh.FACEMESH_LIPS,
+            'nose': mp_face_mesh.FACEMESH_NOSE,
+        }
+
+        if results.multi_face_landmarks:
+            for face_landmarks in results.multi_face_landmarks:
+                ih, iw, _ = image.shape
+                min_x = iw
+                min_y = ih
+                max_x = 0
+                max_y = 0
+
+                # Process each landmark and calculate bounding box
+                for lm in face_landmarks.landmark:
+                    x, y = int(lm.x * iw), int(lm.y * ih)
+                    landmarks_data.append({'x': x, 'y': y})
+                    min_x = min(min_x, x)
+                    min_y = min(min_y, y)
+                    max_x = max(max_x, x)
+                    max_y = max(max_y, y)
+
+                # Create the bounding box
+                bounding_box = {'x': min_x, 'y': min_y, 'width': max_x - min_x, 'height': max_y - min_y}
+
+                # Add connections for each region
+                for region, indices in FACE_REGIONS.items():
+                    for start_idx, end_idx in indices:
+                        connections.append({'start': start_idx, 'end': end_idx})
+
+            # Since we are skipping DeepFace emotion analysis, use a placeholder for emotion
+            emotion = 'Neutral'  # Placeholder; you can implement your own emotion detection if needed
+            emotion_probabilities = {'neutral': 1.0}
+
+        return JsonResponse({
+            'emotion': emotion,
+            'landmarks': landmarks_data,
+            'bounding_box': bounding_box,
+            'connections': connections,
+            'emotion_probabilities': emotion_probabilities
+        })
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+#light weight code 
+# @csrf_exempt
+# @api_view(['POST'])
+# def emotion_detection(request):
+#     global last_detected_emotion, emotion_last_updated
+#     if request.method == 'POST':
+#         # Get the base64 image from the frontend
+#         image_data = request.data.get('image').split(',')[1]  # Remove the base64 prefix
+#         image_bytes = base64.b64decode(image_data)
+        
+#         # Convert the bytes to an OpenCV image
+#         image = Image.open(BytesIO(image_bytes))
+#         image = np.array(image)
+#         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # Convert to BGR format for OpenCV
+        
+#         # Resize image to reduce computational load
+#         image = cv2.resize(image, (640, 480))  # Resize to a smaller resolution
+
+#         # Use MediaPipe Face Detection
+#         results = face_detection.process(image)
+
+#         if results.detections:
+#             # Perform emotion analysis using DeepFace (only if enough time has passed)
+#             if time.time() - emotion_last_updated > 2:  # Update every 2 seconds
+#                 # Using 'opencv' backend for emotion analysis
+#                 analysis = DeepFace.analyze(image, actions=['emotion'], enforce_detection=False, detector_backend='opencv')
+#                 emotion = analysis[0]['dominant_emotion']
+#                 emotion_last_updated = time.time()
+#                 last_detected_emotion = emotion
+#             else:
+#                 emotion = last_detected_emotion
+#         else:
+#             emotion = 'No face detected'
+
+#         return JsonResponse({'emotion': emotion})
+
+#     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 @csrf_exempt
 def upload_photo(request):

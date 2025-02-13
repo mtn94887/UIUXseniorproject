@@ -16,12 +16,25 @@
 
 ### for the frontend
 8. cd my-frontend
-9. npm install
+9. npm install (if you haven't set up anything) [OR]
+   npm run build (if you just pull the project and already set up)
 10. npm start (to run)
+
+
+### for the dependencies 
+*** install under the root folder UIUXSENIORPROJECT ***
+1. pip install mediapipe 
+2. pip install -r requirements.txt 
+3. pip install --upgrade pip (if the system says to upgrade)
 
 *** in the frontend after every changes in codes, `npm run build` to be saved and displayed 
 
 ## How to write the codes 
+
+### How to modify codes in frontend 
+cd usabilitytestingproject
+cd my-frontend
+
 
 
 ### `npm start`

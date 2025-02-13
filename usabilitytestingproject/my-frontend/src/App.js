@@ -10,7 +10,10 @@ import WebcamPage from './pages/WebcamPage';
 import TaskForm from './pages/TasksForm';
 import TasksList from './pages/TasksList';
 import BiometricData from './pages/BiometricData';
+import TempWebcam from './pages/TempWebcam';
 import UploadNDisplayBioData from './pages/UploadNDispalyBioData';
+import FacialExpressionRecognition from './pages/FacialExpressionRecognition';
+import WebcamCapture from './pages/temp';
 
 function App() {
   return (
@@ -31,7 +34,12 @@ function App() {
 
           <Route path="/project-main-page/:id" element={<ProjPage />} />
 
-          <Route path="/webcam-page" element={<WebcamPage />} />
+          {<Route path="/webcam-page" element={<WebcamPage />} /> }
+          {<Route path="/temp-web" element={<TempWebcam />} /> }
+          {<Route path="/facial-exp-recog" element={<FacialExpressionRecognition />} /> }
+          {<Route path="/webcam-capture" element={<WebcamCapture />} /> }
+
+
 
           <Route path="/task-form" element={<TaskForm />} />
 
