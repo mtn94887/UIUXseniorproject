@@ -1,13 +1,17 @@
+import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios'; 
+
 //camera related import 
 import { LuCamera,LuCameraOff } from "react-icons/lu";
 import Webcam from 'react-webcam';
 
-import React, { useState, useRef, useEffect } from 'react';
-import axios from 'axios'; 
+//line chart related imports 
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+
 
 function FacialExpressionRecognition(){
 
@@ -17,6 +21,10 @@ function FacialExpressionRecognition(){
     const canvasRef = useRef(null);
     const [isHovered, setHovered] = useState(false);
     const toggleCamera = () => {
+        // if (showWebcam) {
+        //     // If camera is being turned off, trigger CSV download
+        //     handleDownloadCSV();
+        // }
         setShowWebcam(prevState => !prevState);
     };
 
@@ -39,9 +47,7 @@ function FacialExpressionRecognition(){
         setSelectedDeviceId(event.target.value);
     };
 
-
-
-    // emotion related function 
+    // emotion chart related function 
     const [emotion, setEmotion] = useState(''); 
     const [emotionHistory, setEmotionHistory] = useState([]); 
     const emotionList = ["happy", "sad", "angry", "surprise", "neutral", "disgust", "fear"];
@@ -54,6 +60,7 @@ function FacialExpressionRecognition(){
         disgust: "green",
         fear: "purple",
     };
+
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     
     //facial landmark related function 
@@ -135,8 +142,6 @@ function FacialExpressionRecognition(){
     //         });
     //     }
     // };
-
-
     const drawLandmarks = (landmarks, emotion, boundingBox, connections, emotionProbabilities) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -268,7 +273,93 @@ function FacialExpressionRecognition(){
     }, [showWebcam]);
 
 
+    //line chart related functions 
+    const chartData = {
+        labels: emotionHistory.map((data) => data.time), // X-axis: Timestamps
+        datasets: emotionList.map((emotion) => ({
+            label: emotion,
+            data: emotionHistory.map((entry) => (entry[emotion] || 0)),
+            borderColor: emotionColors[emotion],
+            backgroundColor: `${emotionColors[emotion]}33`, // Transparent version
+            tension: 0.4,
+            fill: false,
+        })),
+    };
+    const chartOptions = {
+        responsive: true,
+        scales: {
+            y: {
+                min: 0,
+                max: 100, // Set Y-axis range to 0% to 100%
+                ticks: {
+                    stepSize: 25,
+                    callback: (value) => `${value}%`, // Add percentage symbol to ticks
+                    color: 'black',
+                },
+                grid: {
+                    color: 'gray', // Gridline color
+                },
+            },
+            x: {
+                ticks: {
+                    color: 'black', // X-axis labels color
+                },
+                grid: {
+                    color: 'gray', // X-axis gridlines
+                },
+            },
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: (tooltipItem) => {
+                        const emotion = tooltipItem.dataset.label;
+                        const value = tooltipItem.raw.toFixed(2); // Format value to two decimals
+                        return `${emotion}: ${value}`;
+                    },
+                },
+            },
+            legend: {
+                labels: {
+                    boxWidth: 10, // Adjust to make legend squares smaller
+                    boxHeight: 10, // Ensure a square shape
+                    usePointStyle: false, // Ensure square instead of circles
+                },
+            },
+        },
+    };
 
+
+    //csv file download related functions 
+    const convertToCSV = (data) => {
+        // Define CSV headers
+        const headers = ["Time", ...emotionList];
+        const rows = data.map(entry => {
+            const time = entry.time;
+            const percentages = emotionList.map(emotion => entry[emotion] || 0);
+            return [time, ...percentages];
+        });
+    
+        // Create CSV content
+        const csvContent = [
+            headers.join(","),
+            ...rows.map(row => row.join(","))
+        ].join("\n");
+    
+        return csvContent;
+    };
+    const downloadCSV = (csvContent, filename = "emotion_data.csv") => {
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+    };
+    const handleDownloadCSV = () => {
+        const csvContent = convertToCSV(emotionHistory);
+        downloadCSV(csvContent);
+    };
+    
 
     return (
         <div style={styles.row}>
@@ -389,8 +480,27 @@ function FacialExpressionRecognition(){
                 </div>
                 <div style={styles.column}>
                     <div style={styles.box2}>
+                        {emotionHistory.length > 0 && !showWebcam && (
+                            <div style={{ width: '100%', height: '100%', overflowX: 'auto' }}>
+                                <Line data={chartData} options={chartOptions} />
+                            </div>
+                        )},
+                        {/* {!showWebcam && (
+                            <button onClick={handleDownloadCSV} style={styles.downloadButton}>
+                                Download CSV
+                            </button>
+                        )} */}
                     </div>
                     <h4 style={styles.caption}>Emotion Line Chart</h4>
+                    {!showWebcam && (
+                            <button onClick={handleDownloadCSV} 
+                            style={{
+                                ...styles.downloadButton, 
+                                ...(isHovered ? styles.downloadbuttonHover : {}) 
+                            }}>
+                                Download CSV
+                            </button>
+                    )}
                 </div>
             </div>
         </div>
@@ -442,7 +552,10 @@ const styles = {
         borderRadius: '10px', // Rounded corners
         backdropFilter: 'blur(10px)', // Blurry effect
         boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)', // Drop shadow for depth
+        position: 'relative', // Make sure the chart wrapper is within this
+        overflow: 'hidden', // Prevent overflow outside box2
     },
+   
 
     camerabutton: {
         marginTop: '10px',
@@ -467,8 +580,25 @@ const styles = {
     caption: { 
         marginTop: '10px',
         alignSelf: 'center', //to align the text in the center 
-    }
+    },
+
+    downloadButton: {
+        marginTop: '20px',
+        backgroundColor: '#4A90E2',
+        border: 'none',
+        borderRadius: '5px',
+        padding: '10px 20px',
+        color: 'white',
+        cursor: 'pointer',
+        fontSize: '16px',
+        transition: 'background-color 0.3s',
+    },
+    downloadbuttonHover: {
+        backgroundColor: '#357ABD', // Darker blue on hover
+        transform: 'scale(1.1)', // Slightly enlarge
+    },
   }
+
   
 
 export default FacialExpressionRecognition; 
