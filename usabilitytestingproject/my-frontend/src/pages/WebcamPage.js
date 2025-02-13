@@ -319,8 +319,8 @@ function WebcamPage(){
                     padding: "20px", // Increased padding for extra space
                     borderRadius: "8px",
                     border: "1px solid #ccc", // Optional border for clarity
-                    width: "1000px", // Adjust width if needed
-                    height: "600px", // Set a fixed height for better Y-axis visibility
+                    width: "1400px", // Adjust width if needed
+                    height: "1000px", // Set a fixed height for better Y-axis visibility
                 }}>
                     <h3>Emotion History Chart</h3>
                     <Line data={chartData} options={chartOptions} style={{ width: "100%", height: "500px" }} />
